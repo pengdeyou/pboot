@@ -193,10 +193,10 @@ Views and Models
 Your extension views might want to interact with specific models in your
 database, or some other extension or data connected to your application.
 For example, let's consider a ``Pboot-SimpleBlog`` extension that works
-with Flask-SQLAlchemy to provide a ``Post`` model and views to write
+with pboot-pbatis to provide a ``Post`` model and views to write
 and read posts.
 
-The ``Post`` model needs to subclass the Flask-SQLAlchemy ``db.Model``
+The ``Post`` model needs to subclass the pboot-pbatis ``db.Model``
 object, but that's only available once you've created an instance of
 that extension, not when your extension is defining its views. So how
 can the view code, defined before the model exists, access the model?

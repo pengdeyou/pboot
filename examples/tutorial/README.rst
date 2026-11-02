@@ -14,7 +14,7 @@ you're reading.** You probably want the latest tagged version, but the
 default Git version is the main branch. ::
 
     # clone the repository
-    $ git clone https://github.com/pallets/flask
+    $ git clone https://gitee.com/pboot-org/pboot
     $ cd pboot
     # checkout the correct version
     $ git tag  # shows the tagged versions

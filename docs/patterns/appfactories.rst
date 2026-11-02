@@ -58,7 +58,7 @@ Factories & Extensions
 It's preferable to create your extensions and app factories so that the
 extension object does not initially get bound to the application.
 
-Using `Flask-SQLAlchemy <https://flask-sqlalchemy.palletsprojects.com/>`_,
+Using `pboot-pbatis <https://gitee.com/pboot-org/pboot-pbatis>`_,
 as an example, you should not do something along those lines::
 
     def create_app(config_filename):

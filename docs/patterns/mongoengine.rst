@@ -5,12 +5,12 @@ Using a document database like MongoDB is a common alternative to
 relational SQL databases. This pattern shows how to use
 `MongoEngine`_, a document mapper library, to integrate with MongoDB.
 
-A running MongoDB server and `Flask-MongoEngine`_ are required. ::
+A running MongoDB server and `pboot-mongoengine`_ are required. ::
 
-    pip install flask-mongoengine
+    pip install pboot-mongoengine
 
 .. _MongoEngine: http://mongoengine.org
-.. _Flask-MongoEngine: https://docs.mongoengine.org/projects/flask-mongoengine/en/latest/
+.. _pboot-mongoengine: https://gitee.com/pboot-org/pboot-mongoengine
 
 Configuration
 -------------
@@ -19,7 +19,7 @@ Basic setup can be done by defining ``MONGODB_SETTINGS`` on
 ``app.config`` and creating a ``MongoEngine`` instance. ::
 
     from pboot import Pboot
-    from flask_mongoengine import MongoEngine
+    from pboot_mongoengine import MongoEngine
 
     app = Pboot(__name__)
     app.config['MONGODB_SETTINGS'] = {
@@ -98,5 +98,5 @@ There are many more ways to define and query documents with MongoEngine.
 For more information, check out the `official documentation
 <MongoEngine_>`_.
 
-Flask-MongoEngine adds helpful utilities on top of MongoEngine. Check
-out their `documentation <Flask-MongoEngine_>`_ as well.
+pboot-mongoengine adds helpful utilities on top of MongoEngine. Check
+out their `documentation <pboot-mongoengine_>`_ as well.

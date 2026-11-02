@@ -145,7 +145,7 @@ class Pboot(App):
         Why is that?  The application will work even with `__name__`, thanks
         to how resources are looked up.  However it will make debugging more
         painful.  Certain extensions can make assumptions based on the
-        import name of your application.  For example the Flask-SQLAlchemy
+        import name of your application.  For example the pboot-pbatis
         extension will look for the code in your application that triggered
         an SQL query in debug mode.  If the import name is not properly set
         up, that debugging information is lost.  (For example it would only

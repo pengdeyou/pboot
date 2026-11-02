@@ -140,7 +140,7 @@ context will be active, and the app instance will be imported. ::
     $ pboot shell
     Python 3.10.0 (default, Oct 27 2021, 06:59:51) [GCC 11.1.0] on linux
     App: example [production]
-    Instance: /home/david/Projects/pallets/flask/instance
+    Instance: /home/david/Projects/pboot/pboot/instance
     >>>
 
 Use :meth:`~Pboot.shell_context_processor` to add other automatic imports.

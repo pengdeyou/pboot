@@ -9,7 +9,7 @@ is not necessary, it makes a lot of sense.
 There are four very common ways to use SQLAlchemy.  I will outline each
 of them here:
 
-Flask-SQLAlchemy Extension
+pboot-pbatis Extension
 --------------------------
 
 Because SQLAlchemy is a common database abstraction layer and object
@@ -17,10 +17,10 @@ relational mapper that requires a little bit of configuration effort,
 there is a Pboot extension that handles that for you.  This is recommended
 if you want to get started quickly.
 
-You can download `Flask-SQLAlchemy`_ from `PyPI
-<https://pypi.org/project/Flask-SQLAlchemy/>`_.
+You can download `pboot-pbatis`_ from `PyPI
+<https://pypi.org/project/pboot-pbatis/>`_.
 
-.. _Flask-SQLAlchemy: https://flask-sqlalchemy.palletsprojects.com/
+.. _pboot-pbatis: https://gitee.com/pboot-org/pboot-pbatis
 
 
 Declarative

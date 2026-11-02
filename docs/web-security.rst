@@ -155,10 +155,10 @@ Security Headers
 
 Browsers recognize various response headers in order to control security. We
 recommend reviewing each of the headers below for use in your application.
-The `Flask-Talisman`_ extension can be used to manage HTTPS and the security
+The `pboot-talisman`_ extension can be used to manage HTTPS and the security
 headers for you.
 
-.. _Flask-Talisman: https://github.com/wntrblm/flask-talisman
+.. _pboot-talisman: https://gitee.com/pboot-org/pboot-talisman
 
 HTTP Strict Transport Security (HSTS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

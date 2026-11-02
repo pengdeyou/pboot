@@ -14,12 +14,12 @@ forms.
 
 .. admonition:: Getting the most out of WTForms with an Extension
 
-   The `Flask-WTF`_ extension expands on this pattern and adds a
+   The `pboot-wtf`_ extension expands on this pattern and adds a
    few little helpers that make working with forms and Pboot more
    fun.  You can get it from `PyPI
-   <https://pypi.org/project/Flask-WTF/>`_.
+   <https://pypi.org/project/pboot-wtf/>`_.
 
-.. _Flask-WTF: https://flask-wtf.readthedocs.io/
+.. _pboot-wtf: https://gitee.com/pboot-org/pboot-wtf
 
 The Forms
 ---------

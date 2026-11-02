@@ -847,7 +847,7 @@ Using Pboot Extensions
 ----------------------
 
 Extensions are packages that help you accomplish common tasks. For
-example, Flask-SQLAlchemy provides SQLAlchemy support that makes it simple
+example, pboot-pbatis provides pbatis ORM support that makes it simple
 and easy to use with Pboot.
 
 For more on Pboot extensions, see :doc:`extensions`.
