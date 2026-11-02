@@ -1,19 +1,19 @@
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
 Application Setup
 =================
 
-A Flask application is an instance of the :class:`Flask` class.
+A Pboot application is an instance of the :class:`Pboot` class.
 Everything about the application, such as configuration and URLs, will
 be registered with this class.
 
-The most straightforward way to create a Flask application is to create
-a global :class:`Flask` instance directly at the top of your code, like
+The most straightforward way to create a Pboot application is to create
+a global :class:`Pboot` instance directly at the top of your code, like
 how the "Hello, World!" example did on the previous page. While this is
 simple and useful in some cases, it can cause some tricky issues as the
 project grows.
 
-Instead of creating a :class:`Flask` instance globally, you will create
+Instead of creating a :class:`Pboot` instance globally, you will create
 it inside a function. This function is known as the *application
 factory*. Any configuration, registration, and other setup the
 application needs will happen inside the function, then the application
@@ -23,29 +23,29 @@ will be returned.
 The Application Factory
 -----------------------
 
-It's time to start coding! Create the ``flaskr`` directory and add the
+It's time to start coding! Create the ``pbootr`` directory and add the
 ``__init__.py`` file. The ``__init__.py`` serves double duty: it will
-contain the application factory, and it tells Python that the ``flaskr``
+contain the application factory, and it tells Python that the ``pbootr``
 directory should be treated as a package.
 
 .. code-block:: none
 
-    $ mkdir flaskr
+    $ mkdir pbootr
 
 .. code-block:: python
-    :caption: ``flaskr/__init__.py``
+    :caption: ``pbootr/__init__.py``
 
     import os
 
-    from flask import Flask
+    from pboot import Pboot
 
 
     def create_app(test_config=None):
         # create and configure the app
-        app = Flask(__name__, instance_relative_config=True)
+        app = Pboot(__name__, instance_relative_config=True)
         app.config.from_mapping(
             SECRET_KEY='dev',
-            DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+            DATABASE=os.path.join(app.instance_path, 'pbootr.sqlite'),
         )
 
         if test_config is None:
@@ -68,8 +68,8 @@ directory should be treated as a package.
 ``create_app`` is the application factory function. You'll add to it
 later in the tutorial, but it already does a lot.
 
-#.  ``app = Flask(__name__, instance_relative_config=True)`` creates the
-    :class:`Flask` instance.
+#.  ``app = Pboot(__name__, instance_relative_config=True)`` creates the
+    :class:`Pboot` instance.
 
     *   ``__name__`` is the name of the current Python module. The app
         needs to know where it's located to set up some paths, and
@@ -78,22 +78,22 @@ later in the tutorial, but it already does a lot.
     *   ``instance_relative_config=True`` tells the app that
         configuration files are relative to the
         :ref:`instance folder <instance-folders>`. The instance folder
-        is located outside the ``flaskr`` package and can hold local
+        is located outside the ``pbootr`` package and can hold local
         data that shouldn't be committed to version control, such as
         configuration secrets and the database file.
 
 #.  :meth:`app.config.from_mapping() <Config.from_mapping>` sets
     some default configuration that the app will use:
 
-    *   :data:`SECRET_KEY` is used by Flask and extensions to keep data
+    *   :data:`SECRET_KEY` is used by Pboot and extensions to keep data
         safe. It's set to ``'dev'`` to provide a convenient value
         during development, but it should be overridden with a random
         value when deploying.
 
     *   ``DATABASE`` is the path where the SQLite database file will be
         saved. It's under
-        :attr:`app.instance_path <Flask.instance_path>`, which is the
-        path that Flask has chosen for the instance folder. You'll learn
+        :attr:`app.instance_path <Pboot.instance_path>`, which is the
+        path that Pboot has chosen for the instance folder. You'll learn
         more about the database in the next section.
 
 #.  :meth:`app.config.from_pyfile() <Config.from_pyfile>` overrides
@@ -107,12 +107,12 @@ later in the tutorial, but it already does a lot.
         independently of any development values you have configured.
 
 #.  :func:`os.makedirs` ensures that
-    :attr:`app.instance_path <Flask.instance_path>` exists. Flask
+    :attr:`app.instance_path <Pboot.instance_path>` exists. Pboot
     doesn't create the instance folder automatically, but it needs to be
     created because your project will create the SQLite database file
     there.
 
-#.  :meth:`@app.route() <Flask.route>` creates a simple route so you can
+#.  :meth:`@app.route() <Pboot.route>` creates a simple route so you can
     see the application working before getting into the rest of the
     tutorial. It creates a connection between the URL ``/hello`` and a
     function that returns a response, the string ``'Hello, World!'`` in
@@ -122,10 +122,10 @@ later in the tutorial, but it already does a lot.
 Run The Application
 -------------------
 
-Now you can run your application using the ``flask`` command. From the
-terminal, tell Flask where to find your application, then run it in
+Now you can run your application using the ``pboot`` command. From the
+terminal, tell Pboot where to find your application, then run it in
 debug mode. Remember, you should still be in the top-level
-``flask-tutorial`` directory, not the ``flaskr`` package.
+``pboot-tutorial`` directory, not the ``pbootr`` package.
 
 Debug mode shows an interactive debugger whenever a page raises an
 exception, and restarts the server whenever you make changes to the
@@ -134,13 +134,13 @@ follow the tutorial.
 
 .. code-block:: text
 
-    $ flask --app flaskr run --debug
+    $ pboot --app pbootr run --debug
 
 You'll see output similar to this:
 
 .. code-block:: text
 
-     * Serving Flask app "flaskr"
+     * Serving Pboot app "pbootr"
      * Debug mode: on
      * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
      * Restarting with stat
@@ -148,7 +148,7 @@ You'll see output similar to this:
      * Debugger PIN: nnn-nnn-nnn
 
 Visit http://127.0.0.1:5000/hello in a browser and you should see the
-"Hello, World!" message. Congratulations, you're now running your Flask
+"Hello, World!" message. Congratulations, you're now running your Pboot
 web application!
 
 If another program is already using port 5000, you'll see

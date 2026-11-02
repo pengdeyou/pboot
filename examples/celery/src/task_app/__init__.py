@@ -1,11 +1,11 @@
 from celery import Celery
 from celery import Task
-from flask import Flask
-from flask import render_template
+from pboot import Pboot
+from pboot import render_template
 
 
-def create_app() -> Flask:
-    app = Flask(__name__)
+def create_app() -> Pboot:
+    app = Pboot(__name__)
     app.config.from_mapping(
         CELERY={
             "broker_url": "redis://localhost",
@@ -26,13 +26,13 @@ def create_app() -> Flask:
     return app
 
 
-def celery_init_app(app: Flask) -> Celery:
-    class FlaskTask(Task):
+def celery_init_app(app: Pboot) -> Celery:
+    class PbootTask(Task):
         def __call__(self, *args: object, **kwargs: object) -> object:
             with app.app_context():
                 return self.run(*args, **kwargs)
 
-    celery_app = Celery(app.name, task_cls=FlaskTask)
+    celery_app = Celery(app.name, task_cls=PbootTask)
     celery_app.config_from_object(app.config["CELERY"])
     celery_app.set_default()
     app.extensions["celery"] = celery_app

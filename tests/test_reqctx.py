@@ -6,10 +6,10 @@ from concurrent import futures
 
 import pytest
 
-import flask
-from flask.sessions import SecureCookieSessionInterface
-from flask.sessions import SessionInterface
-from flask.testing import FlaskClient
+import pboot
+from pboot.sessions import SecureCookieSessionInterface
+from pboot.sessions import SessionInterface
+from pboot.testing import PbootClient
 
 
 def test_teardown_on_pop(app):
@@ -72,20 +72,20 @@ def test_proper_test_request_context(app):
 
     with app.test_request_context("/"):
         assert (
-            flask.url_for("index", _external=True)
+            pboot.url_for("index", _external=True)
             == "http://localhost.localdomain:5000/"
         )
 
     with app.test_request_context("/"):
         assert (
-            flask.url_for("sub", _external=True)
+            pboot.url_for("sub", _external=True)
             == "http://foo.localhost.localdomain:5000/"
         )
 
     # suppress Werkzeug 0.15 warning about name mismatch
     with warnings.catch_warnings():
         warnings.filterwarnings(
-            "ignore", "Current server name", UserWarning, "flask.app"
+            "ignore", "Current server name", UserWarning, "pboot.app"
         )
         with app.test_request_context(
             "/", environ_overrides={"HTTP_HOST": "localhost"}
@@ -106,27 +106,27 @@ def test_proper_test_request_context(app):
 def test_context_binding(app):
     @app.route("/")
     def index():
-        return f"Hello {flask.request.args['name']}!"
+        return f"Hello {pboot.request.args['name']}!"
 
     @app.route("/meh")
     def meh():
-        return flask.request.url
+        return pboot.request.url
 
     with app.test_request_context("/?name=World"):
         assert index() == "Hello World!"
     with app.test_request_context("/meh"):
         assert meh() == "http://localhost/meh"
-    assert not flask.request
+    assert not pboot.request
 
 
 def test_context_test(app):
-    assert not flask.request
-    assert not flask.has_request_context()
+    assert not pboot.request
+    assert not pboot.has_request_context()
     ctx = app.test_request_context()
     ctx.push()
     try:
-        assert flask.request
-        assert flask.has_request_context()
+        assert pboot.request
+        assert pboot.has_request_context()
     finally:
         ctx.pop()
 
@@ -134,7 +134,7 @@ def test_context_test(app):
 def test_manual_context_binding(app):
     @app.route("/")
     def index():
-        return f"Hello {flask.request.args['name']}!"
+        return f"Hello {pboot.request.args['name']}!"
 
     ctx = app.test_request_context("/?name=World")
     ctx.push()
@@ -145,7 +145,7 @@ def test_manual_context_binding(app):
 
 
 def test_copy_context_thread(
-    request: pytest.FixtureRequest, app: flask.Flask, client: FlaskClient
+    request: pytest.FixtureRequest, app: pboot.Pboot, client: PbootClient
 ) -> None:
     executor = futures.ThreadPoolExecutor(max_workers=2)
     request.addfinalizer(lambda: executor.shutdown(cancel_futures=True))
@@ -153,14 +153,14 @@ def test_copy_context_thread(
 
     @app.route("/")
     def index():
-        flask.session["fizz"] = "buzz"
+        pboot.session["fizz"] = "buzz"
 
-        @flask.copy_current_request_context
+        @pboot.copy_current_request_context
         def work(n: int) -> int:
-            assert flask.current_app == app
-            assert flask.request.path == "/"
-            assert flask.request.args["foo"] == "bar"
-            assert flask.session["fizz"] == "buzz"
+            assert pboot.current_app == app
+            assert pboot.request.path == "/"
+            assert pboot.request.args["foo"] == "bar"
+            assert pboot.session["fizz"] == "buzz"
             return n
 
         nonlocal result
@@ -182,10 +182,10 @@ def test_session_error_pops_context():
         def open_session(self, app, request):
             raise SessionError()
 
-    class CustomFlask(flask.Flask):
+    class CustomPboot(pboot.Pboot):
         session_interface = FailingSessionInterface()
 
-    app = CustomFlask(__name__)
+    app = CustomPboot(__name__)
 
     @app.route("/")
     def index():
@@ -194,8 +194,8 @@ def test_session_error_pops_context():
 
     response = app.test_client().get("/")
     assert response.status_code == 500
-    assert not flask.request
-    assert not flask.current_app
+    assert not pboot.request
+    assert not pboot.current_app
 
 
 def test_session_dynamic_cookie_name():
@@ -203,35 +203,35 @@ def test_session_dynamic_cookie_name():
     # requested url ends with the string "dynamic_cookie"
     class PathAwareSessionInterface(SecureCookieSessionInterface):
         def get_cookie_name(self, app):
-            if flask.request.url.endswith("dynamic_cookie"):
+            if pboot.request.url.endswith("dynamic_cookie"):
                 return "dynamic_cookie_name"
             else:
                 return super().get_cookie_name(app)
 
-    class CustomFlask(flask.Flask):
+    class CustomPboot(pboot.Pboot):
         session_interface = PathAwareSessionInterface()
 
-    app = CustomFlask(__name__)
+    app = CustomPboot(__name__)
     app.secret_key = "secret_key"
 
     @app.route("/set", methods=["POST"])
     def set():
-        flask.session["value"] = flask.request.form["value"]
+        pboot.session["value"] = pboot.request.form["value"]
         return "value set"
 
     @app.route("/get")
     def get():
-        v = flask.session.get("value", "None")
+        v = pboot.session.get("value", "None")
         return v
 
     @app.route("/set_dynamic_cookie", methods=["POST"])
     def set_dynamic_cookie():
-        flask.session["value"] = flask.request.form["value"]
+        pboot.session["value"] = pboot.request.form["value"]
         return "value set"
 
     @app.route("/get_dynamic_cookie")
     def get_dynamic_cookie():
-        v = flask.session.get("value", "None")
+        v = pboot.session.get("value", "None")
         return v
 
     test_client = app.test_client()

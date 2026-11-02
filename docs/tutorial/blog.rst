@@ -1,4 +1,4 @@
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
 Blog Blueprint
 ==============
@@ -18,24 +18,24 @@ The Blueprint
 Define the blueprint and register it in the application factory.
 
 .. code-block:: python
-    :caption: ``flaskr/blog.py``
+    :caption: ``pbootr/blog.py``
 
-    from flask import (
+    from pboot import (
         Blueprint, flash, g, redirect, render_template, request, url_for
     )
     from werkzeug.exceptions import abort
 
-    from flaskr.auth import login_required
-    from flaskr.db import get_db
+    from pbootr.auth import login_required
+    from pbootr.db import get_db
 
     bp = Blueprint('blog', __name__)
 
 Import and register the blueprint from the factory using
-:meth:`app.register_blueprint() <Flask.register_blueprint>`. Place the
+:meth:`app.register_blueprint() <Pboot.register_blueprint>`. Place the
 new code at the end of the factory function before returning the app.
 
 .. code-block:: python
-    :caption: ``flaskr/__init__.py``
+    :caption: ``pbootr/__init__.py``
 
     def create_app():
         app = ...
@@ -50,12 +50,12 @@ new code at the end of the factory function before returning the app.
 
 Unlike the auth blueprint, the blog blueprint does not have a
 ``url_prefix``. So the ``index`` view will be at ``/``, the ``create``
-view at ``/create``, and so on. The blog is the main feature of Flaskr,
+view at ``/create``, and so on. The blog is the main feature of Pbootr,
 so it makes sense that the blog index will be the main index.
 
 However, the endpoint for the ``index`` view defined below will be
 ``blog.index``. Some of the authentication views referred to a plain
-``index`` endpoint. :meth:`app.add_url_rule() <Flask.add_url_rule>`
+``index`` endpoint. :meth:`app.add_url_rule() <Pboot.add_url_rule>`
 associates the endpoint name ``'index'`` with the ``/`` url so that
 ``url_for('index')`` or ``url_for('blog.index')`` will both work,
 generating the same ``/`` URL either way.
@@ -74,7 +74,7 @@ used so that the author information from the ``user`` table is
 available in the result.
 
 .. code-block:: python
-    :caption: ``flaskr/blog.py``
+    :caption: ``pbootr/blog.py``
 
     @bp.route('/')
     def index():
@@ -87,7 +87,7 @@ available in the result.
         return render_template('blog/index.html', posts=posts)
 
 .. code-block:: html+jinja
-    :caption: ``flaskr/templates/blog/index.html``
+    :caption: ``pbootr/templates/blog/index.html``
 
     {% extends 'base.html' %}
 
@@ -140,7 +140,7 @@ views. A user must be logged in to visit these views, otherwise they
 will be redirected to the login page.
 
 .. code-block:: python
-    :caption: ``flaskr/blog.py``
+    :caption: ``pbootr/blog.py``
 
     @bp.route('/create', methods=('GET', 'POST'))
     @login_required
@@ -168,7 +168,7 @@ will be redirected to the login page.
         return render_template('blog/create.html')
 
 .. code-block:: html+jinja
-    :caption: ``flaskr/templates/blog/create.html``
+    :caption: ``pbootr/templates/blog/create.html``
 
     {% extends 'base.html' %}
 
@@ -196,7 +196,7 @@ duplicating code, you can write a function to get the ``post`` and call
 it from each view.
 
 .. code-block:: python
-    :caption: ``flaskr/blog.py``
+    :caption: ``pbootr/blog.py``
 
     def get_post(id, check_author=True):
         post = get_db().execute(
@@ -226,7 +226,7 @@ if you wrote a view to show an individual post on a page, where the user
 doesn't matter because they're not modifying the post.
 
 .. code-block:: python
-    :caption: ``flaskr/blog.py``
+    :caption: ``pbootr/blog.py``
 
     @bp.route('/<int:id>/update', methods=('GET', 'POST'))
     @login_required
@@ -257,7 +257,7 @@ doesn't matter because they're not modifying the post.
 
 Unlike the views you've written so far, the ``update`` function takes
 an argument, ``id``. That corresponds to the ``<int:id>`` in the route.
-A real URL will look like ``/1/update``. Flask will capture the ``1``,
+A real URL will look like ``/1/update``. Pboot will capture the ``1``,
 ensure it's an :class:`int`, and pass it as the ``id`` argument. If you
 don't specify ``int:`` and instead do ``<id>``, it will be a string.
 To generate a URL to the update page, :func:`url_for` needs to be passed
@@ -272,7 +272,7 @@ you could use one view and template for both actions, but for the
 tutorial it's clearer to keep them separate.
 
 .. code-block:: html+jinja
-    :caption: ``flaskr/templates/blog/update.html``
+    :caption: ``pbootr/templates/blog/update.html``
 
     {% extends 'base.html' %}
 
@@ -318,7 +318,7 @@ is no template, it will only handle the ``POST`` method and then redirect
 to the ``index`` view.
 
 .. code-block:: python
-    :caption: ``flaskr/blog.py``
+    :caption: ``pbootr/blog.py``
 
     @bp.route('/<int:id>/delete', methods=('POST',))
     @login_required

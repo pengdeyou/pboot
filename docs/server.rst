@@ -1,9 +1,9 @@
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
 Development Server
 ==================
 
-Flask provides a ``run`` command to run the application with a development server. In
+Pboot provides a ``run`` command to run the application with a development server. In
 debug mode, this server provides an interactive debugger and will reload when code is
 changed.
 
@@ -18,16 +18,16 @@ changed.
 Command Line
 ------------
 
-The ``flask run`` CLI command is the recommended way to run the development server. Use
+The ``pboot run`` CLI command is the recommended way to run the development server. Use
 the ``--app`` option to point to your application, and the ``--debug`` option to enable
 debug mode.
 
 .. code-block:: text
 
-    $ flask --app hello run --debug
+    $ pboot --app hello run --debug
 
 This enables debug mode, including the interactive debugger and reloader, and then
-starts the server on http://localhost:5000/. Use ``flask run --help`` to see the
+starts the server on http://localhost:5000/. Use ``pboot run --help`` to see the
 available options, and :doc:`/cli` for detailed instructions about configuring and using
 the CLI.
 
@@ -46,7 +46,7 @@ messages:
     in a way forbidden by its access permissions``
 
 Either identify and stop the other program, or use
-``flask run --port 5001`` to pick a different port.
+``pboot run --port 5001`` to pick a different port.
 
 You can use ``netstat`` or ``lsof`` to identify what process id is using
 a port, then use other operating system tools stop that process. The
@@ -83,12 +83,12 @@ searching for "AirPlay Receiver" in System Settings and toggling it off.
 Deferred Errors on Reload
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When using the ``flask run`` command with the reloader, the server will
+When using the ``pboot run`` command with the reloader, the server will
 continue to run even if you introduce syntax errors or other
 initialization errors into the code. Accessing the site will show the
 interactive debugger for the error, rather than crashing the server.
 
-If a syntax error is already present when calling ``flask run``, it will
+If a syntax error is already present when calling ``pboot run``, it will
 fail immediately and show the traceback rather than waiting until the
 site is accessed. This is intended to make errors more visible initially
 while still allowing the server to handle errors on reload.
@@ -97,7 +97,7 @@ while still allowing the server to handle errors on reload.
 In Code
 -------
 
-The development server can also be started from Python with the :meth:`Flask.run`
+The development server can also be started from Python with the :meth:`Pboot.run`
 method. This method takes arguments similar to the CLI options to control the server.
 The main difference from the CLI command is that the server will crash if there are
 errors when reloading. ``debug=True`` can be passed to enable debug mode.

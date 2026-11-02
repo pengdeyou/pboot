@@ -1,3 +1,3 @@
-from flask import Module
+from pboot import Module
 
 mod = Module(__name__, "foo", subdomain="foo")

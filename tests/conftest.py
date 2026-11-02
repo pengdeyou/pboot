@@ -3,8 +3,8 @@ import sys
 
 import pytest
 
-from flask import Flask
-from flask.globals import app_ctx as _app_ctx
+from pboot import Pboot
+from pboot.globals import app_ctx as _app_ctx
 
 
 @pytest.fixture(autouse=True)
@@ -13,10 +13,10 @@ def _standard_os_environ(monkeypatch):
     standard values.
     """
     for key in (
-        "FLASK_ENV_FILE",
-        "FLASK_APP",
-        "FLASK_DEBUG",
-        "FLASK_RUN_FROM_CLI",
+        "PBOOT_ENV_FILE",
+        "PBOOT_APP",
+        "PBOOT_DEBUG",
+        "PBOOT_RUN_FROM_CLI",
         "WERKZEUG_RUN_MAIN",
     ):
         monkeypatch.delenv(key, False)
@@ -26,7 +26,7 @@ def _standard_os_environ(monkeypatch):
 
 @pytest.fixture
 def app():
-    app = Flask("flask_test", root_path=os.path.dirname(__file__))
+    app = Pboot("pboot_test", root_path=os.path.dirname(__file__))
     app.config.update(
         TESTING=True,
         SECRET_KEY="test key",

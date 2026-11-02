@@ -1,4 +1,4 @@
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
 Define and Access the Database
 ==============================
@@ -34,13 +34,13 @@ is created at some point when handling a request, and closed before the
 response is sent.
 
 .. code-block:: python
-    :caption: ``flaskr/db.py``
+    :caption: ``pbootr/db.py``
 
     import sqlite3
     from datetime import datetime
 
     import click
-    from flask import current_app, g
+    from pboot import current_app, g
 
 
     def get_db():
@@ -66,7 +66,7 @@ the request. The connection is stored and reused instead of creating a
 new connection if ``get_db`` is called a second time in the same
 request.
 
-:data:`.current_app` is another special object that points to the Flask
+:data:`.current_app` is another special object that points to the Pboot
 application handling the request. Since you used an application factory,
 there is no application object when writing the rest of your code.
 ``get_db`` will be called when the application has been created and is
@@ -89,12 +89,12 @@ Create the Tables
 -----------------
 
 In SQLite, data is stored in *tables* and *columns*. These need to be
-created before you can store and retrieve data. Flaskr will store users
+created before you can store and retrieve data. Pbootr will store users
 in the ``user`` table, and posts in the ``post`` table. Create a file
 with the SQL commands needed to create empty tables:
 
 .. code-block:: sql
-    :caption: ``flaskr/schema.sql``
+    :caption: ``pbootr/schema.sql``
 
     DROP TABLE IF EXISTS user;
     DROP TABLE IF EXISTS post;
@@ -118,7 +118,7 @@ Add the Python functions that will run these SQL commands to the
 ``db.py`` file:
 
 .. code-block:: python
-    :caption: ``flaskr/db.py``
+    :caption: ``pbootr/db.py``
 
     def init_db():
         db = get_db()
@@ -138,8 +138,8 @@ Add the Python functions that will run these SQL commands to the
         "timestamp", lambda v: datetime.fromisoformat(v.decode())
     )
 
-:meth:`open_resource() <Flask.open_resource>` opens a file relative to
-the ``flaskr`` package, which is useful since you won't necessarily know
+:meth:`open_resource() <Pboot.open_resource>` opens a file relative to
+the ``pbootr`` package, which is useful since you won't necessarily know
 where that location is when deploying the application later. ``get_db``
 returns a database connection, which is used to execute the commands
 read from the file.
@@ -163,24 +163,24 @@ instance isn't available when writing the functions. Instead, write a
 function that takes an application and does the registration.
 
 .. code-block:: python
-    :caption: ``flaskr/db.py``
+    :caption: ``pbootr/db.py``
 
     def init_app(app):
         app.teardown_appcontext(close_db)
         app.cli.add_command(init_db_command)
 
-:meth:`app.teardown_appcontext() <Flask.teardown_appcontext>` tells
-Flask to call that function when cleaning up after returning the
+:meth:`app.teardown_appcontext() <Pboot.teardown_appcontext>` tells
+Pboot to call that function when cleaning up after returning the
 response.
 
 :meth:`app.cli.add_command() <click.Group.add_command>` adds a new
-command that can be called with the ``flask`` command.
+command that can be called with the ``pboot`` command.
 
 Import and call this function from the factory. Place the new code at
 the end of the factory function before returning the app.
 
 .. code-block:: python
-    :caption: ``flaskr/__init__.py``
+    :caption: ``pbootr/__init__.py``
 
     def create_app():
         app = ...
@@ -196,7 +196,7 @@ Initialize the Database File
 ----------------------------
 
 Now that ``init-db`` has been registered with the app, it can be called
-using the ``flask`` command, similar to the ``run`` command from the
+using the ``pboot`` command, similar to the ``run`` command from the
 previous page.
 
 .. note::
@@ -210,10 +210,10 @@ Run the ``init-db`` command:
 
 .. code-block:: none
 
-    $ flask --app flaskr init-db
+    $ pboot --app pbootr init-db
     Initialized the database.
 
-There will now be a ``flaskr.sqlite`` file in the ``instance`` folder in
+There will now be a ``pbootr.sqlite`` file in the ``instance`` folder in
 your project.
 
 Continue to :doc:`views`.

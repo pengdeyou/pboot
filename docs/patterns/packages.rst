@@ -1,7 +1,7 @@
 Large Applications as Packages
 ==============================
 
-Imagine a simple flask application structure that looks like this::
+Imagine a simple pboot application structure that looks like this::
 
     /yourapplication
         yourapplication.py
@@ -50,7 +50,7 @@ a big problem, just add a new file called :file:`pyproject.toml` next to the inn
     [project]
     name = "yourapplication"
     dependencies = [
-        "flask",
+        "pboot",
     ]
 
     [build-system]
@@ -63,30 +63,30 @@ Install your application so it is importable:
 
     $ pip install -e .
 
-To use the ``flask`` command and run your application you need to set
-the ``--app`` option that tells Flask where to find the application
+To use the ``pboot`` command and run your application you need to set
+the ``--app`` option that tells Pboot where to find the application
 instance:
 
 .. code-block:: text
 
-    $ flask --app yourapplication run
+    $ pboot --app yourapplication run
 
 What did we gain from this?  Now we can restructure the application a bit
 into multiple modules.  The only thing you have to remember is the
 following quick checklist:
 
-1. the `Flask` application object creation has to be in the
+1. the `Pboot` application object creation has to be in the
    :file:`__init__.py` file.  That way each module can import it safely and the
    `__name__` variable will resolve to the correct package.
-2. all the view functions (the ones with a :meth:`~flask.Flask.route`
+2. all the view functions (the ones with a :meth:`~pboot.Pboot.route`
    decorator on top) have to be imported in the :file:`__init__.py` file.
    Not the object itself, but the module it is in. Import the view module
    **after the application object is created**.
 
 Here's an example :file:`__init__.py`::
 
-    from flask import Flask
-    app = Flask(__name__)
+    from pboot import Pboot
+    app = Pboot(__name__)
 
     import yourapplication.views
 

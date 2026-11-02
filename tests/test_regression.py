@@ -1,4 +1,4 @@
-import flask
+import pboot
 
 
 def test_aborting(app):
@@ -11,7 +11,7 @@ def test_aborting(app):
 
     @app.route("/")
     def index():
-        raise flask.abort(flask.redirect(flask.url_for("test")))
+        raise pboot.abort(pboot.redirect(pboot.url_for("test")))
 
     @app.route("/test")
     def test():

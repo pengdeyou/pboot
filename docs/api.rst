@@ -1,17 +1,17 @@
 API
 ===
 
-.. module:: flask
+.. module:: pboot
 
-This part of the documentation covers all the interfaces of Flask. For
-parts where Flask depends on external libraries, we document the most
+This part of the documentation covers all the interfaces of Pboot. For
+parts where Pboot depends on external libraries, we document the most
 important right here and provide links to the canonical documentation.
 
 
 Application Object
 ------------------
 
-.. autoclass:: Flask
+.. autoclass:: Pboot
    :members:
    :inherited-members:
 
@@ -45,7 +45,7 @@ Incoming Request Data
 Response Objects
 ----------------
 
-.. autoclass:: flask.Response
+.. autoclass:: pboot.Response
     :members:
     :inherited-members:
     :exclude-members: json_module
@@ -53,9 +53,9 @@ Response Objects
 Sessions
 --------
 
-If you have set :attr:`Flask.secret_key` (or configured it from
-:data:`SECRET_KEY`) you can use sessions in Flask applications. A session makes
-it possible to remember information from one request to another. The way Flask
+If you have set :attr:`Pboot.secret_key` (or configured it from
+:data:`SECRET_KEY`) you can use sessions in Pboot applications. A session makes
+it possible to remember information from one request to another. The way Pboot
 does this is by using a signed cookie. The user can look at the session
 contents, but can't modify it unless they know the secret key, so make sure to
 set that to something complex and unguessable.
@@ -95,9 +95,9 @@ Session Interface
 .. versionadded:: 0.8
 
 The session interface provides a simple way to replace the session
-implementation that Flask is using.
+implementation that Pboot is using.
 
-.. currentmodule:: flask.sessions
+.. currentmodule:: pboot.sessions
 
 .. autoclass:: SessionInterface
    :members:
@@ -117,36 +117,36 @@ implementation that Flask is using.
 .. admonition:: Notice
 
     The :data:`PERMANENT_SESSION_LIFETIME` config can be an integer or ``timedelta``.
-    The :attr:`~flask.Flask.permanent_session_lifetime` attribute is always a
+    The :attr:`~pboot.Pboot.permanent_session_lifetime` attribute is always a
     ``timedelta``.
 
 
 Test Client
 -----------
 
-.. currentmodule:: flask.testing
+.. currentmodule:: pboot.testing
 
-.. autoclass:: FlaskClient
+.. autoclass:: PbootClient
    :members:
 
 
 Test CLI Runner
 ---------------
 
-.. currentmodule:: flask.testing
+.. currentmodule:: pboot.testing
 
-.. autoclass:: FlaskCliRunner
+.. autoclass:: PbootCliRunner
     :members:
 
 
 Application Globals
 -------------------
 
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
 To share data that is valid for one request only from one function to
 another, a global variable is not good enough because it would break in
-threaded environments. Flask provides you with a special object that
+threaded environments. Pboot provides you with a special object that
 ensures it is only valid for the active request and that will return
 different values for each request. In a nutshell: it does the right
 thing, like it does for :data:`.request` and :data:`.session`.
@@ -154,11 +154,11 @@ thing, like it does for :data:`.request` and :data:`.session`.
 .. data:: g
 
     A proxy to a namespace object used to store data during a single request or
-    app context. An instance of :attr:`.Flask.app_ctx_globals_class`, which
+    app context. An instance of :attr:`.Pboot.app_ctx_globals_class`, which
     defaults to :class:`._AppCtxGlobals`.
 
     This is a good place to store resources during a request. For example, a
-    :meth:`~.Flask.before_request` function could load a user object from a
+    :meth:`~.Pboot.before_request` function could load a user object from a
     session id, then set ``g.user`` to be used in the view function.
 
     This is only available when an :doc:`app context </appcontext>` is active.
@@ -168,7 +168,7 @@ thing, like it does for :data:`.request` and :data:`.session`.
     .. versionchanged:: 0.10
         Bound to the application context instead of the request context.
 
-.. autoclass:: flask.ctx._AppCtxGlobals
+.. autoclass:: pboot.ctx._AppCtxGlobals
     :members:
 
 
@@ -177,7 +177,7 @@ Useful Functions and Classes
 
 .. data:: current_app
 
-    A proxy to the :class:`.Flask` application handling the current request or
+    A proxy to the :class:`.Pboot` application handling the current request or
     other activity.
 
     This is useful to access the application without needing to import it, or if
@@ -220,12 +220,12 @@ Message Flashing
 JSON Support
 ------------
 
-.. module:: flask.json
+.. module:: pboot.json
 
-Flask uses Python's built-in :mod:`json` module for handling JSON by
+Pboot uses Python's built-in :mod:`json` module for handling JSON by
 default. The JSON implementation can be changed by assigning a different
-provider to :attr:`flask.Flask.json_provider_class` or
-:attr:`flask.Flask.json`. The functions provided by ``flask.json`` will
+provider to :attr:`pboot.Pboot.json_provider_class` or
+:attr:`pboot.Pboot.json`. The functions provided by ``pboot.json`` will
 use methods on ``app.json`` if an app context is active.
 
 Jinja's ``|tojson`` filter is configured to use the app's JSON provider.
@@ -249,21 +249,21 @@ HTML ``<script>`` tags.
 
 .. autofunction:: load
 
-.. autoclass:: flask.json.provider.JSONProvider
+.. autoclass:: pboot.json.provider.JSONProvider
     :members:
     :member-order: bysource
 
-.. autoclass:: flask.json.provider.DefaultJSONProvider
+.. autoclass:: pboot.json.provider.DefaultJSONProvider
     :members:
     :member-order: bysource
 
-.. automodule:: flask.json.tag
+.. automodule:: pboot.json.tag
 
 
 Template Rendering
 ------------------
 
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
 .. autofunction:: render_template
 
@@ -290,14 +290,14 @@ Stream Helpers
 Useful Internals
 ----------------
 
-.. autoclass:: flask.ctx.AppContext
+.. autoclass:: pboot.ctx.AppContext
    :members:
 
-.. data:: flask.globals.app_ctx
+.. data:: pboot.globals.app_ctx
 
     A proxy to the active :class:`.AppContext`.
 
-    This is an internal object that is essential to how Flask handles requests.
+    This is an internal object that is essential to how Pboot handles requests.
     Accessing this should not be needed in most cases. Most likely you want
     :data:`.current_app`, :data:`.g`, :data:`.request`, and :data:`.session` instead.
 
@@ -306,17 +306,17 @@ Useful Internals
 
     This is a proxy. See :ref:`context-visibility` for more information.
 
-.. class:: flask.ctx.RequestContext
+.. class:: pboot.ctx.RequestContext
 
     .. deprecated:: 3.2
-        Merged with :class:`AppContext`. This alias will be removed in Flask 4.0.
+        Merged with :class:`AppContext`. This alias will be removed in Pboot 4.0.
 
-.. data:: flask.globals.request_ctx
+.. data:: pboot.globals.request_ctx
 
     .. deprecated:: 3.2
-        Merged with :data:`.app_ctx`. This alias will be removed in Flask 4.0.
+        Merged with :data:`.app_ctx`. This alias will be removed in Pboot 4.0.
 
-.. autoclass:: flask.blueprints.BlueprintSetupState
+.. autoclass:: pboot.blueprints.BlueprintSetupState
    :members:
 
 .. _core-signals-list:
@@ -341,10 +341,10 @@ Signals are provided by the `Blinker`_ library. See :doc:`signals` for an introd
                                 template.name or 'string template',
                                 context)
 
-        from flask import template_rendered
+        from pboot import template_rendered
         template_rendered.connect(log_template_renders, app)
 
-.. data:: flask.before_render_template
+.. data:: pboot.before_render_template
    :noindex:
 
    This signal is sent before template rendering process. The
@@ -358,7 +358,7 @@ Signals are provided by the `Blinker`_ library. See :doc:`signals` for an introd
                                 template.name or 'string template',
                                 context)
 
-        from flask import before_render_template
+        from pboot import before_render_template
         before_render_template.connect(log_template_renders, app)
 
 .. data:: request_started
@@ -366,14 +366,14 @@ Signals are provided by the `Blinker`_ library. See :doc:`signals` for an introd
    This signal is sent when the request context is set up, before
    any request processing happens. Because the request context is already
    bound, the subscriber can access the request with the standard global
-   proxies such as :class:`~flask.request`.
+   proxies such as :class:`~pboot.request`.
 
    Example subscriber::
 
         def log_request(sender, **extra):
             sender.logger.debug('Request context is set up')
 
-        from flask import request_started
+        from pboot import request_started
         request_started.connect(log_request, app)
 
 .. data:: request_finished
@@ -387,7 +387,7 @@ Signals are provided by the `Blinker`_ library. See :doc:`signals` for an introd
             sender.logger.debug('Request context is about to close down. '
                                 'Response: %s', response)
 
-        from flask import request_finished
+        from pboot import request_finished
         request_finished.connect(log_response, app)
 
 .. data:: got_request_exception
@@ -406,7 +406,7 @@ Signals are provided by the `Blinker`_ library. See :doc:`signals` for an introd
 
     .. code-block:: python
 
-        from flask import got_request_exception
+        from pboot import got_request_exception
 
         def log_security_exception(sender, exception, **extra):
             if not isinstance(exception, SecurityException):
@@ -431,10 +431,10 @@ Signals are provided by the `Blinker`_ library. See :doc:`signals` for an introd
         def close_db_connection(sender, **extra):
             session.close()
 
-        from flask import request_tearing_down
+        from pboot import request_tearing_down
         request_tearing_down.connect(close_db_connection, app)
 
-   As of Flask 0.9, this will also be passed an `exc` keyword argument
+   As of Pboot 0.9, this will also be passed an `exc` keyword argument
    that has a reference to the exception that caused the teardown if
    there was one.
 
@@ -450,7 +450,7 @@ Signals are provided by the `Blinker`_ library. See :doc:`signals` for an introd
         def close_db_connection(sender, **extra):
             session.close()
 
-        from flask import appcontext_tearing_down
+        from pboot import appcontext_tearing_down
         appcontext_tearing_down.connect(close_db_connection, app)
 
    This will also be passed an `exc` keyword argument that has a reference
@@ -466,7 +466,7 @@ Signals are provided by the `Blinker`_ library. See :doc:`signals` for an introd
    Example usage::
 
         from contextlib import contextmanager
-        from flask import appcontext_pushed
+        from pboot import appcontext_pushed
 
         @contextmanager
         def user_set(app, user):
@@ -505,7 +505,7 @@ Signals are provided by the `Blinker`_ library. See :doc:`signals` for an introd
         def record(sender, message, category, **extra):
             recorded.append((message, category))
 
-        from flask import message_flashed
+        from pboot import message_flashed
         message_flashed.connect(record, app)
 
    .. versionadded:: 0.10
@@ -518,10 +518,10 @@ Class-Based Views
 
 .. currentmodule:: None
 
-.. autoclass:: flask.views.View
+.. autoclass:: pboot.views.View
    :members:
 
-.. autoclass:: flask.views.MethodView
+.. autoclass:: pboot.views.MethodView
    :members:
 
 .. _url-route-registrations:
@@ -531,10 +531,10 @@ URL Route Registrations
 
 Generally there are three ways to define rules for the routing system:
 
-1.  You can use the :meth:`flask.Flask.route` decorator.
-2.  You can use the :meth:`flask.Flask.add_url_rule` function.
+1.  You can use the :meth:`pboot.Pboot.route` decorator.
+2.  You can use the :meth:`pboot.Pboot.add_url_rule` function.
 3.  You can directly access the underlying Werkzeug routing system
-    which is exposed as :attr:`flask.Flask.url_map`.
+    which is exposed as :attr:`pboot.Pboot.url_map`.
 
 Variable parts in the route can be specified with angular brackets
 (``/user/<username>``). By default a variable part in the URL accepts any
@@ -554,7 +554,7 @@ The following converters are available:
 `uuid`      accepts UUID strings
 =========== ===============================================
 
-Custom converters can be defined using :attr:`flask.Flask.url_map`.
+Custom converters can be defined using :attr:`pboot.Pboot.url_map`.
 
 Here are some examples::
 
@@ -570,7 +570,7 @@ Here are some examples::
     def show_post(post_id):
         pass
 
-An important detail to keep in mind is how Flask deals with trailing
+An important detail to keep in mind is how Pboot deals with trailing
 slashes. The idea is to keep each URL unique so the following rules
 apply:
 
@@ -606,20 +606,20 @@ can't preserve form data. ::
    def region(id):
       pass
 
-Here are the parameters that :meth:`~flask.Flask.route` and
-:meth:`~flask.Flask.add_url_rule` accept. The only difference is that
+Here are the parameters that :meth:`~pboot.Pboot.route` and
+:meth:`~pboot.Pboot.add_url_rule` accept. The only difference is that
 with the route parameter the view function is defined with the decorator
 instead of the `view_func` parameter.
 
 =============== ==========================================================
 `rule`          the URL rule as string
-`endpoint`      the endpoint for the registered URL rule. Flask itself
+`endpoint`      the endpoint for the registered URL rule. Pboot itself
                 assumes that the name of the view function is the name
                 of the endpoint if not explicitly stated.
 `view_func`     the function to call when serving a request to the
                 provided endpoint. If this is not provided one can
                 specify the function later by storing it in the
-                :attr:`~flask.Flask.view_functions` dictionary with the
+                :attr:`~pboot.Pboot.view_functions` dictionary with the
                 endpoint as key.
 `defaults`      A dictionary with defaults for this rule. See the
                 example above for how defaults work.
@@ -631,7 +631,7 @@ instead of the `view_func` parameter.
                 Werkzeug is handling of method options. methods is a list
                 of methods this rule should be limited to (``GET``, ``POST``
                 etc.). By default a rule just listens for ``GET`` (and
-                implicitly ``HEAD``). Starting with Flask 0.6, ``OPTIONS`` is
+                implicitly ``HEAD``). Starting with Pboot 0.6, ``OPTIONS`` is
                 implicitly added and handled by the standard request
                 handling. They have to be specified as keyword arguments.
 =============== ==========================================================
@@ -643,7 +643,7 @@ View Function Options
 For internal usage the view functions can have some attributes attached to
 customize behavior the view function would normally not have control over.
 The following attributes can be provided optionally to either override
-some defaults to :meth:`~flask.Flask.add_url_rule` or general behavior:
+some defaults to :meth:`~pboot.Pboot.add_url_rule` or general behavior:
 
 -   `__name__`: The name of a function is by default used as endpoint. If
     endpoint is provided explicitly this value is used. Additionally this
@@ -651,17 +651,17 @@ some defaults to :meth:`~flask.Flask.add_url_rule` or general behavior:
     cannot be customized from the function itself.
 
 -   `methods`: If methods are not provided when the URL rule is added,
-    Flask will look on the view function object itself if a `methods`
+    Pboot will look on the view function object itself if a `methods`
     attribute exists. If it does, it will pull the information for the
     methods from there.
 
--   `provide_automatic_options`: if this attribute is set Flask will
+-   `provide_automatic_options`: if this attribute is set Pboot will
     either force enable or disable the automatic implementation of the
     HTTP ``OPTIONS`` response. This can be useful when working with
     decorators that want to customize the ``OPTIONS`` response on a per-view
     basis.
 
--   `required_methods`: if this attribute is set, Flask will always add
+-   `required_methods`: if this attribute is set, Pboot will always add
     these methods when registering a URL rule even if the methods were
     explicitly overridden in the ``route()`` call.
 
@@ -683,9 +683,9 @@ Full example::
 Command Line Interface
 ----------------------
 
-.. currentmodule:: flask.cli
+.. currentmodule:: pboot.cli
 
-.. autoclass:: FlaskGroup
+.. autoclass:: PbootGroup
    :members:
 
 .. autoclass:: AppGroup

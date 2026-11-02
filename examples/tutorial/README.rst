@@ -1,9 +1,9 @@
-Flaskr
+Pbootr
 ======
 
-The basic blog app built in the Flask `tutorial`_.
+The basic blog app built in the Pboot `tutorial`_.
 
-.. _tutorial: https://flask.palletsprojects.com/tutorial/
+.. _tutorial: https://gitee.com/pboot-org/pboot/tree/main/examples/tutorial
 
 
 Install
@@ -15,7 +15,7 @@ default Git version is the main branch. ::
 
     # clone the repository
     $ git clone https://github.com/pallets/flask
-    $ cd flask
+    $ cd pboot
     # checkout the correct version
     $ git tag  # shows the tagged versions
     $ git checkout latest-tag-found-above
@@ -31,12 +31,12 @@ Or on Windows cmd::
     $ py -3 -m venv .venv
     $ .venv\Scripts\activate.bat
 
-Install Flaskr::
+Install Pbootr::
 
     $ pip install -e .
 
-Or if you are using the main branch, install Flask from source before
-installing Flaskr::
+Or if you are using the main branch, install Pboot from source before
+installing Pbootr::
 
     $ pip install -e ../..
     $ pip install -e .
@@ -47,8 +47,8 @@ Run
 
 .. code-block:: text
 
-    $ flask --app flaskr init-db
-    $ flask --app flaskr run --debug
+    $ pboot --app pbootr init-db
+    $ pboot --app pbootr run --debug
 
 Open http://127.0.0.1:5000 in a browser.
 

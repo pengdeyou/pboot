@@ -1,7 +1,7 @@
-Testing Flask Applications
+Testing Pboot Applications
 ==========================
 
-Flask provides utilities for testing an application. This documentation
+Pboot provides utilities for testing an application. This documentation
 goes over techniques for working with different parts of the application
 in tests.
 
@@ -14,7 +14,7 @@ We will use the `pytest`_ framework to set up and run our tests.
 .. _pytest: https://docs.pytest.org/
 
 The :doc:`tutorial </tutorial/index>` goes over how to write tests for
-100% coverage of the sample Flaskr blog application. See
+100% coverage of the sample Pbootr blog application. See
 :doc:`the tutorial on tests </tutorial/tests>` for a detailed
 explanation of specific tests for an application.
 
@@ -84,7 +84,7 @@ Sending Requests with the Test Client
 -------------------------------------
 
 The test client makes requests to the application without running a live
-server. Flask's client extends
+server. Pboot's client extends
 :doc:`Werkzeug's client <werkzeug:test>`, see those docs for additional
 information.
 
@@ -142,7 +142,7 @@ use ``pathlib.Path`` to get files relative to the current test file.
 
     def test_edit_user(client):
         response = client.post("/user/2/edit", data={
-            "name": "Flask",
+            "name": "Pboot",
             "theme": "dark",
             "picture": (resources / "picture.png").open("rb"),
         })
@@ -173,7 +173,7 @@ attribute will contain the deserialized object.
             """,
             variables={"id": 2},
         })
-        assert response.json["data"]["user"]["name"] == "Flask"
+        assert response.json["data"]["user"]["name"] == "Pboot"
 
 
 Following Redirects
@@ -202,18 +202,18 @@ which records the request that produced that response.
 Accessing and Modifying the Session
 -----------------------------------
 
-To access Flask's context variables, mainly
-:data:`~flask.session`, use the client in a ``with`` statement.
+To access Pboot's context variables, mainly
+:data:`~pboot.session`, use the client in a ``with`` statement.
 The app and request context will remain active *after* making a request,
 until the ``with`` block ends.
 
 .. code-block:: python
 
-    from flask import session
+    from pboot import session
 
     def test_access_session(client):
         with client:
-            client.post("/auth/login", data={"username": "flask"})
+            client.post("/auth/login", data={"username": "pboot"})
             # session is still accessible
             assert session["user_id"] == 1
 
@@ -221,13 +221,13 @@ until the ``with`` block ends.
 
 If you want to access or set a value in the session *before* making a
 request, use the client's
-:meth:`~flask.testing.FlaskClient.session_transaction` method in a
+:meth:`~pboot.testing.PbootClient.session_transaction` method in a
 ``with`` statement. It returns a session object, and will save the
 session once the block ends.
 
 .. code-block:: python
 
-    from flask import session
+    from pboot import session
 
     def test_modify_session(client):
         with client.session_transaction() as session:
@@ -237,7 +237,7 @@ session once the block ends.
         # session is saved now
 
         response = client.get("/users/me")
-        assert response.json["username"] == "flask"
+        assert response.json["username"] == "pboot"
 
 
 .. _testing-cli:
@@ -245,14 +245,14 @@ session once the block ends.
 Running Commands with the CLI Runner
 ------------------------------------
 
-Flask provides :meth:`~flask.Flask.test_cli_runner` to create a
-:class:`~flask.testing.FlaskCliRunner`, which runs CLI commands in
+Pboot provides :meth:`~pboot.Pboot.test_cli_runner` to create a
+:class:`~pboot.testing.PbootCliRunner`, which runs CLI commands in
 isolation and captures the output in a :class:`~click.testing.Result`
-object. Flask's runner extends :doc:`Click's runner <click:testing>`,
+object. Pboot's runner extends :doc:`Click's runner <click:testing>`,
 see those docs for additional information.
 
-Use the runner's :meth:`~flask.testing.FlaskCliRunner.invoke` method to
-call commands in the same way they would be called with the ``flask``
+Use the runner's :meth:`~pboot.testing.PbootCliRunner.invoke` method to
+call commands in the same way they would be called with the ``pboot``
 command from the command line.
 
 .. code-block:: python
@@ -268,8 +268,8 @@ command from the command line.
         result = runner.invoke(args="hello")
         assert "World" in result.output
 
-        result = runner.invoke(args=["hello", "--name", "Flask"])
-        assert "Flask" in result.output
+        result = runner.invoke(args=["hello", "--name", "Pboot"])
+        assert "Pboot" in result.output
 
 
 Tests that depend on an Active Context
@@ -305,7 +305,7 @@ takes the same arguments as the test client's request methods.
 
         assert messages["name"][0] == "Name cannot be empty."
 
-Creating a test request context doesn't run any of the Flask dispatching
+Creating a test request context doesn't run any of the Pboot dispatching
 code, so ``before_request`` functions are not called. If you need to
 call these, usually it's better to make a full request instead. However,
 it's possible to call them manually.
@@ -315,4 +315,4 @@ it's possible to call them manually.
     def test_auth_token(app):
         with app.test_request_context("/user/2/edit", headers={"X-Auth-Token": "1"}):
             app.preprocess_request()
-            assert g.user.name == "Flask"
+            assert g.user.name == "Pboot"

@@ -4,7 +4,7 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.exceptions import InternalServerError
 from werkzeug.exceptions import NotFound
 
-import flask
+import pboot
 
 
 def test_error_handler_no_match(app, client):
@@ -50,7 +50,7 @@ def test_error_handler_no_match(app, client):
 
     @app.route("/abort")
     def do_abort():
-        flask.abort(500)
+        pboot.abort(500)
 
     app.testing = False
     assert client.get("/custom").data == b"custom"
@@ -134,7 +134,7 @@ def test_error_handler_http_subclass(app):
 
 
 def test_error_handler_blueprint(app):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.errorhandler(500)
     def bp_exception_handler(e):
@@ -161,7 +161,7 @@ def test_error_handler_blueprint(app):
 
 
 def test_default_error_handler():
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.errorhandler(HTTPException)
     def bp_exception_handler(e):
@@ -182,7 +182,7 @@ def test_default_error_handler():
     def bp_forbidden_test():
         raise Forbidden()
 
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
 
     @app.errorhandler(HTTPException)
     def catchall_exception_handler(e):
@@ -232,7 +232,7 @@ class TestGenericHandlers:
 
         @app.route("/abort")
         def do_abort():
-            flask.abort(500)
+            pboot.abort(500)
 
         @app.route("/raise")
         def do_raise():

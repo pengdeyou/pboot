@@ -6,9 +6,9 @@ import uuid
 import pytest
 from werkzeug.http import http_date
 
-import flask
-from flask import json
-from flask.json.provider import DefaultJSONProvider
+import pboot
+from pboot import json
+from pboot.json.provider import DefaultJSONProvider
 
 
 @pytest.mark.parametrize("debug", (True, False))
@@ -18,7 +18,7 @@ def test_bad_request_debug_message(app, client, debug):
 
     @app.route("/json", methods=["POST"])
     def post_json():
-        flask.request.get_json()
+        pboot.request.get_json()
         return None
 
     rv = client.post("/json", data=None, content_type="application/json")
@@ -30,7 +30,7 @@ def test_bad_request_debug_message(app, client, debug):
 def test_json_bad_requests(app, client):
     @app.route("/json", methods=["POST"])
     def return_json():
-        return flask.jsonify(foo=str(flask.request.get_json()))
+        return pboot.jsonify(foo=str(pboot.request.get_json()))
 
     rv = client.post("/json", data="malformed", content_type="application/json")
     assert rv.status_code == 400
@@ -39,7 +39,7 @@ def test_json_bad_requests(app, client):
 def test_json_custom_mimetypes(app, client):
     @app.route("/json", methods=["POST"])
     def return_json():
-        return flask.request.get_json()
+        return pboot.request.get_json()
 
     rv = client.post("/json", data='"foo"', content_type="application/x+json")
     assert rv.data == b"foo"
@@ -55,12 +55,12 @@ def test_json_as_unicode(test_value, expected, app, app_ctx):
 
 
 def test_json_dump_to_file(app, app_ctx):
-    test_data = {"name": "Flask"}
+    test_data = {"name": "Pboot"}
     out = io.StringIO()
 
-    flask.json.dump(test_data, out)
+    pboot.json.dump(test_data, out)
     out.seek(0)
-    rv = flask.json.load(out)
+    rv = pboot.json.load(out)
     assert rv == test_data
 
 
@@ -69,10 +69,10 @@ def test_json_dump_to_file(app, app_ctx):
 )
 def test_jsonify_basic_types(test_value, app, client):
     url = "/jsonify_basic_types"
-    app.add_url_rule(url, url, lambda x=test_value: flask.jsonify(x))
+    app.add_url_rule(url, url, lambda x=test_value: pboot.jsonify(x))
     rv = client.get(url)
     assert rv.mimetype == "application/json"
-    assert flask.json.loads(rv.data) == test_value
+    assert pboot.json.loads(rv.data) == test_value
 
 
 def test_jsonify_dicts(app, client):
@@ -90,16 +90,16 @@ def test_jsonify_dicts(app, client):
 
     @app.route("/kw")
     def return_kwargs():
-        return flask.jsonify(**d)
+        return pboot.jsonify(**d)
 
     @app.route("/dict")
     def return_dict():
-        return flask.jsonify(d)
+        return pboot.jsonify(d)
 
     for url in "/kw", "/dict":
         rv = client.get(url)
         assert rv.mimetype == "application/json"
-        assert flask.json.loads(rv.data) == d
+        assert pboot.json.loads(rv.data) == d
 
 
 def test_jsonify_arrays(app, client):
@@ -118,16 +118,16 @@ def test_jsonify_arrays(app, client):
 
     @app.route("/args_unpack")
     def return_args_unpack():
-        return flask.jsonify(*a_list)
+        return pboot.jsonify(*a_list)
 
     @app.route("/array")
     def return_array():
-        return flask.jsonify(a_list)
+        return pboot.jsonify(a_list)
 
     for url in "/args_unpack", "/array":
         rv = client.get(url)
         assert rv.mimetype == "application/json"
-        assert flask.json.loads(rv.data) == a_list
+        assert pboot.json.loads(rv.data) == a_list
 
 
 @pytest.mark.parametrize(
@@ -136,7 +136,7 @@ def test_jsonify_arrays(app, client):
 def test_jsonify_datetime(app, client, value):
     @app.route("/")
     def index():
-        return flask.jsonify(value=value)
+        return pboot.jsonify(value=value)
 
     r = client.get()
     assert r.json["value"] == http_date(value)
@@ -170,7 +170,7 @@ def test_jsonify_aware_datetimes(tz):
     dt = datetime.datetime(2017, 1, 1, 12, 34, 56, tzinfo=tzinfo)
     gmt = FixedOffset(hours=0, name="GMT")
     expected = dt.astimezone(gmt).strftime('"%a, %d %b %Y %H:%M:%S %Z"')
-    assert flask.json.dumps(dt) == expected
+    assert pboot.json.dumps(dt) == expected
 
 
 def test_jsonify_uuid_types(app, client):
@@ -178,30 +178,30 @@ def test_jsonify_uuid_types(app, client):
 
     test_uuid = uuid.UUID(bytes=b"\xde\xad\xbe\xef" * 4)
     url = "/uuid_test"
-    app.add_url_rule(url, url, lambda: flask.jsonify(x=test_uuid))
+    app.add_url_rule(url, url, lambda: pboot.jsonify(x=test_uuid))
 
     rv = client.get(url)
 
-    rv_x = flask.json.loads(rv.data)["x"]
+    rv_x = pboot.json.loads(rv.data)["x"]
     assert rv_x == str(test_uuid)
     rv_uuid = uuid.UUID(rv_x)
     assert rv_uuid == test_uuid
 
 
 def test_json_decimal():
-    rv = flask.json.dumps(decimal.Decimal("0.003"))
+    rv = pboot.json.dumps(decimal.Decimal("0.003"))
     assert rv == '"0.003"'
 
 
 def test_json_attr(app, client):
     @app.route("/add", methods=["POST"])
     def add():
-        json = flask.request.get_json()
+        json = pboot.request.get_json()
         return str(json["a"] + json["b"])
 
     rv = client.post(
         "/add",
-        data=flask.json.dumps({"a": 1, "b": 2}),
+        data=pboot.json.dumps({"a": 1, "b": 2}),
         content_type="application/json",
     )
     assert rv.data == b"3"
@@ -209,8 +209,8 @@ def test_json_attr(app, client):
 
 def test_tojson_filter(app, req_ctx):
     # The tojson filter is tested in Jinja, this confirms that it's
-    # using Flask's dumps.
-    rv = flask.render_template_string(
+    # using Pboot's dumps.
+    rv = pboot.render_template_string(
         "const data = {{ data|tojson }};",
         data={"name": "</script>", "time": datetime.datetime(2021, 2, 1, 7, 15)},
     )
@@ -247,11 +247,11 @@ def test_json_customization(app, client):
 
     @app.route("/", methods=["POST"])
     def index():
-        return flask.json.dumps(flask.request.get_json()["x"])
+        return pboot.json.dumps(pboot.request.get_json()["x"])
 
     rv = client.post(
         "/",
-        data=flask.json.dumps({"x": {"_foo": 42}}),
+        data=pboot.json.dumps({"x": {"_foo": 42}}),
         content_type="application/json",
     )
     assert rv.data == b'"<42>"'
@@ -274,7 +274,7 @@ def test_json_key_sorting(app, client):
 
     @app.route("/")
     def index():
-        return flask.jsonify(values=d)
+        return pboot.jsonify(values=d)
 
     rv = client.get("/")
     lines = [x.strip() for x in rv.data.strip().decode("utf-8").splitlines()]

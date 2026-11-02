@@ -8,13 +8,13 @@ background while the request returns immediately.
 
 `Celery`_ is a powerful task queue that can be used for simple background tasks as well
 as complex multi-stage programs and schedules. This guide will show you how to configure
-Celery using Flask. Read Celery's `First Steps with Celery`_ guide to learn how to use
+Celery using Pboot. Read Celery's `First Steps with Celery`_ guide to learn how to use
 Celery itself.
 
 .. _Celery: https://celery.readthedocs.io
 .. _First Steps with Celery: https://celery.readthedocs.io/en/latest/getting-started/first-steps-with-celery.html
 
-The Flask repository contains `an example <https://github.com/pallets/flask/tree/main/examples/celery>`_
+The Pboot repository contains `an example <https://gitee.com/pboot-org/pboot/tree/main/examples/celery>`_
 based on the information on this page, which also shows how to use JavaScript to submit
 tasks and poll for progress and results.
 
@@ -29,36 +29,36 @@ Install Celery from PyPI, for example using pip:
     $ pip install celery
 
 
-Integrate Celery with Flask
+Integrate Celery with Pboot
 ---------------------------
 
-You can use Celery without any integration with Flask, but it's convenient to configure
-it through Flask's config, and to let tasks access the Flask application.
+You can use Celery without any integration with Pboot, but it's convenient to configure
+it through Pboot's config, and to let tasks access the Pboot application.
 
-Celery uses similar ideas to Flask, with a ``Celery`` app object that has configuration
-and registers tasks. While creating a Flask app, use the following code to create and
+Celery uses similar ideas to Pboot, with a ``Celery`` app object that has configuration
+and registers tasks. While creating a Pboot app, use the following code to create and
 configure a Celery app as well.
 
 .. code-block:: python
 
     from celery import Celery, Task
 
-    def celery_init_app(app: Flask) -> Celery:
-        class FlaskTask(Task):
+    def celery_init_app(app: Pboot) -> Celery:
+        class PbootTask(Task):
             def __call__(self, *args: object, **kwargs: object) -> object:
                 with app.app_context():
                     return self.run(*args, **kwargs)
 
-        celery_app = Celery(app.name, task_cls=FlaskTask)
+        celery_app = Celery(app.name, task_cls=PbootTask)
         celery_app.config_from_object(app.config["CELERY"])
         celery_app.set_default()
         app.extensions["celery"] = celery_app
         return celery_app
 
 This creates and returns a ``Celery`` app object. Celery `configuration`_ is taken from
-the ``CELERY`` key in the Flask configuration. The Celery app is set as the default, so
+the ``CELERY`` key in the Pboot configuration. The Celery app is set as the default, so
 that it is seen during each request. The ``Task`` subclass automatically runs task
-functions with a Flask app context active, so that services like your database
+functions with a Pboot app context active, so that services like your database
 connections are available.
 
 .. _configuration: https://celery.readthedocs.io/en/stable/userguide/configuration.html
@@ -69,9 +69,9 @@ only for tasks where we care about the result.
 
 .. code-block:: python
 
-    from flask import Flask
+    from pboot import Pboot
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.config.from_mapping(
         CELERY=dict(
             broker_url="redis://localhost",
@@ -98,14 +98,14 @@ docs for more information about defining schedules.
 Application Factory
 -------------------
 
-When using the Flask application factory pattern, call the ``celery_init_app`` function
+When using the Pboot application factory pattern, call the ``celery_init_app`` function
 inside the factory. It sets ``app.extensions["celery"]`` to the Celery app object, which
-can be used to get the Celery app from the Flask app returned by the factory.
+can be used to get the Celery app from the Pboot app returned by the factory.
 
 .. code-block:: python
 
-    def create_app() -> Flask:
-        app = Flask(__name__)
+    def create_app() -> Pboot:
+        app = Pboot(__name__)
         app.config.from_mapping(
             CELERY=dict(
                 broker_url="redis://localhost",
@@ -118,15 +118,15 @@ can be used to get the Celery app from the Flask app returned by the factory.
         return app
 
 To use ``celery`` commands, Celery needs an app object, but that's no longer directly
-available. Create a ``make_celery.py`` file that calls the Flask app factory and gets
-the Celery app from the returned Flask app.
+available. Create a ``make_celery.py`` file that calls the Pboot app factory and gets
+the Celery app from the returned Pboot app.
 
 .. code-block:: python
 
     from example import create_app
 
-    flask_app = create_app()
-    celery_app = flask_app.extensions["celery"]
+    pboot_app = create_app()
+    celery_app = pboot_app.extensions["celery"]
 
 Point the ``celery`` command to this file.
 
@@ -141,11 +141,11 @@ Defining Tasks
 
 Using ``@celery_app.task`` to decorate task functions requires access to the
 ``celery_app`` object, which won't be available when using the factory pattern. It also
-means that the decorated tasks are tied to the specific Flask and Celery app instances,
+means that the decorated tasks are tied to the specific Pboot and Celery app instances,
 which could be an issue during testing if you change configuration for a test.
 
 Instead, use Celery's ``@shared_task`` decorator. This creates task objects that will
-access whatever the "current app" is, which is a similar concept to Flask's blueprints
+access whatever the "current app" is, which is a similar concept to Pboot's blueprints
 and app context. This is why we called ``celery_app.set_default()`` above.
 
 Here's an example task that adds two numbers together and returns the result.
@@ -175,7 +175,7 @@ previous sections.
 
 .. code-block:: python
 
-    from flask import request
+    from pboot import request
 
     @app.post("/add")
     def start_add() -> dict[str, object]:
@@ -210,10 +210,10 @@ finished successfully, and what the return value (or error) was if it is finishe
         }
 
 Now you can start the task using the first route, then poll for the result using the
-second route. This keeps the Flask request workers from being blocked waiting for tasks
+second route. This keeps the Pboot request workers from being blocked waiting for tasks
 to finish.
 
-The Flask repository contains `an example <https://github.com/pallets/flask/tree/main/examples/celery>`_
+The Pboot repository contains `an example <https://gitee.com/pboot-org/pboot/tree/main/examples/celery>`_
 using JavaScript to submit tasks and poll for progress and results.
 
 
@@ -228,7 +228,7 @@ the session that queried it.
 
 Pass the minimal amount of data necessary to fetch or recreate any complex data within
 the task. Consider a task that will run when the logged in user asks for an archive of
-their data. The Flask request knows the logged in user, and has the user object queried
+their data. The Pboot request knows the logged in user, and has the user object queried
 from the database. It got that by querying the database for a given id, so the task can
 do the same thing. Pass the user's id rather than the user object.
 

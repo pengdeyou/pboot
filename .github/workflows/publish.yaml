@@ -48,7 +48,7 @@ jobs:
     needs: [build]
     environment:
       name: publish
-      url: https://pypi.org/project/Flask/${{ github.ref_name }}
+      url: https://pypi.org/project/pboot/${{ github.ref_name }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write

@@ -1,14 +1,14 @@
-Using SQLite 3 with Flask
+Using SQLite 3 with Pboot
 =========================
 
 You can implement a few functions to work with a SQLite connection during a
 request context. The connection is created the first time it's accessed,
 reused on subsequent access, until it is closed when the request context ends.
 
-Here is a simple example of how you can use SQLite 3 with Flask::
+Here is a simple example of how you can use SQLite 3 with Pboot::
 
     import sqlite3
-    from flask import g
+    from pboot import g
 
     DATABASE = '/path/to/database.db'
 

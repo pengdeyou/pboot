@@ -3,24 +3,24 @@ Working with the Shell
 
 One of the reasons everybody loves Python is the interactive shell. It allows
 you to play around with code in real time and immediately get results back.
-Flask provides the ``flask shell`` CLI command to start an interactive Python
-shell with some setup done to make working with the Flask app easier.
+Pboot provides the ``pboot shell`` CLI command to start an interactive Python
+shell with some setup done to make working with the Pboot app easier.
 
 .. code-block:: text
 
-    $ flask shell
+    $ pboot shell
 
 Creating a Request Context
 --------------------------
 
-``flask shell`` pushes an app context automatically, so :data:`.current_app` and
+``pboot shell`` pushes an app context automatically, so :data:`.current_app` and
 :data:`.g` are already available. However, there is no HTTP request being
 handled in the shell, so :data:`.request` and :data:`.session` are not yet
 available.
 
 The easiest way to create a proper request context from the shell is by
-using the :attr:`~flask.Flask.test_request_context` method which creates
-us a :class:`~flask.ctx.RequestContext`:
+using the :attr:`~pboot.Pboot.test_request_context` method which creates
+us a :class:`~pboot.ctx.RequestContext`:
 
 >>> ctx = app.test_request_context()
 
@@ -42,27 +42,27 @@ By just creating a request context, you still don't have run the code that
 is normally run before a request.  This might result in your database
 being unavailable if you are connecting to the database in a
 before-request callback or the current user not being stored on the
-:data:`~flask.g` object etc.
+:data:`~pboot.g` object etc.
 
 This however can easily be done yourself.  Just call
-:meth:`~flask.Flask.preprocess_request`:
+:meth:`~pboot.Pboot.preprocess_request`:
 
 >>> ctx = app.test_request_context()
 >>> ctx.push()
 >>> app.preprocess_request()
 
-Keep in mind that the :meth:`~flask.Flask.preprocess_request` function
+Keep in mind that the :meth:`~pboot.Pboot.preprocess_request` function
 might return a response object, in that case just ignore it.
 
 To shutdown a request, you need to trick a bit before the after request
-functions (triggered by :meth:`~flask.Flask.process_response`) operate on
+functions (triggered by :meth:`~pboot.Pboot.process_response`) operate on
 a response object:
 
 >>> app.process_response(app.response_class())
 <Response 0 bytes [200 OK]>
 >>> ctx.pop()
 
-The functions registered as :meth:`~flask.Flask.teardown_request` are
+The functions registered as :meth:`~pboot.Pboot.teardown_request` are
 automatically called when the context is popped.  So this is the perfect
 place to automatically tear down resources that were needed by the request
 context (such as database connections).

@@ -1,7 +1,7 @@
-Design Decisions in Flask
+Design Decisions in Pboot
 =========================
 
-If you are curious why Flask does certain things the way it does and not
+If you are curious why Pboot does certain things the way it does and not
 differently, this section is for you.  This should give you an idea about
 some of the design decisions that may appear arbitrary and surprising at
 first, especially in direct comparison with other frameworks.
@@ -11,15 +11,15 @@ The Explicit Application Object
 -------------------------------
 
 A Python web application based on WSGI has to have one central callable
-object that implements the actual application.  In Flask this is an
-instance of the :class:`~flask.Flask` class.  Each Flask application has
+object that implements the actual application.  In Pboot this is an
+instance of the :class:`~pboot.Pboot` class.  Each Pboot application has
 to create an instance of this class itself and pass it the name of the
-module, but why can't Flask do that itself?
+module, but why can't Pboot do that itself?
 
 Without such an explicit application object the following code::
 
-    from flask import Flask
-    app = Flask(__name__)
+    from pboot import Pboot
+    app = Pboot(__name__)
 
     @app.route('/')
     def index():
@@ -27,7 +27,7 @@ Without such an explicit application object the following code::
 
 Would look like this instead::
 
-    from hypothetical_flask import route
+    from hypothetical_pboot import route
 
     @route('/')
     def index():
@@ -46,17 +46,17 @@ allocated will be freed again.
 
 Another thing that becomes possible when you have an explicit object lying
 around in your code is that you can subclass the base class
-(:class:`~flask.Flask`) to alter specific behavior.  This would not be
+(:class:`~pboot.Pboot`) to alter specific behavior.  This would not be
 possible without hacks if the object were created ahead of time for you
 based on a class that is not exposed to you.
 
-But there is another very important reason why Flask depends on an
+But there is another very important reason why Pboot depends on an
 explicit instantiation of that class: the package name.  Whenever you
-create a Flask instance you usually pass it `__name__` as package name.
-Flask depends on that information to properly load resources relative
+create a Pboot instance you usually pass it `__name__` as package name.
+Pboot depends on that information to properly load resources relative
 to your module.  With Python's outstanding support for reflection it can
 then access the package to figure out where the templates and static files
-are stored (see :meth:`~flask.Flask.open_resource`).  Now obviously there
+are stored (see :meth:`~pboot.Pboot.open_resource`).  Now obviously there
 are frameworks around that do not need any configuration and will still be
 able to load templates relative to your application module.  But they have
 to use the current working directory for that, which is a very unreliable
@@ -71,7 +71,7 @@ The third reason is "explicit is better than implicit".  That object is
 your WSGI application, you don't have to remember anything else.  If you
 want to apply a WSGI middleware, just wrap it and you're done (though
 there are better ways to do that so that you do not lose the reference
-to the application object :meth:`~flask.Flask.wsgi_app`).
+to the application object :meth:`~pboot.Pboot.wsgi_app`).
 
 Furthermore this design makes it possible to use a factory function to
 create the application which is very helpful for unit testing and similar
@@ -80,7 +80,7 @@ things (:doc:`/patterns/appfactories`).
 The Routing System
 ------------------
 
-Flask uses the Werkzeug routing system which was designed to
+Pboot uses the Werkzeug routing system which was designed to
 automatically order routes by complexity.  This means that you can declare
 routes in arbitrary order and they will still work as expected.  This is a
 requirement if you want to properly implement decorator based routing
@@ -96,9 +96,9 @@ is ambiguous.
 One Template Engine
 -------------------
 
-Flask decides on one template engine: Jinja.  Why doesn't Flask have a
+Pboot decides on one template engine: Jinja.  Why doesn't Pboot have a
 pluggable template engine interface?  You can obviously use a different
-template engine, but Flask will still configure Jinja for you.  While
+template engine, but Pboot will still configure Jinja for you.  While
 that limitation that Jinja is *always* configured will probably go away,
 the decision to bundle one template engine and use that will not.
 
@@ -118,12 +118,12 @@ other hand treats templates similar to Python modules.
 
 When it comes to connecting a template engine with an application or
 framework there is more than just rendering templates.  For instance,
-Flask uses Jinja's extensive autoescaping support.  Also it provides
+Pboot uses Jinja's extensive autoescaping support.  Also it provides
 ways to access macros from Jinja templates.
 
 A template abstraction layer that would not take the unique features of
 the template engines away is a science on its own and a too large
-undertaking for a microframework like Flask.
+undertaking for a microframework like Pboot.
 
 Furthermore extensions can then easily depend on one template language
 being present.  You can easily use your own templating language, but an
@@ -134,22 +134,22 @@ What does "micro" mean?
 -----------------------
 
 “Micro” does not mean that your whole web application has to fit into a single
-Python file (although it certainly can), nor does it mean that Flask is lacking
-in functionality. The "micro" in microframework means Flask aims to keep the
-core simple but extensible. Flask won't make many decisions for you, such as
+Python file (although it certainly can), nor does it mean that Pboot is lacking
+in functionality. The "micro" in microframework means Pboot aims to keep the
+core simple but extensible. Pboot won't make many decisions for you, such as
 what database to use. Those decisions that it does make, such as what
 templating engine to use, are easy to change.  Everything else is up to you, so
-that Flask can be everything you need and nothing you don't.
+that Pboot can be everything you need and nothing you don't.
 
-By default, Flask does not include a database abstraction layer, form
+By default, Pboot does not include a database abstraction layer, form
 validation or anything else where different libraries already exist that can
-handle that. Instead, Flask supports extensions to add such functionality to
-your application as if it was implemented in Flask itself. Numerous extensions
+handle that. Instead, Pboot supports extensions to add such functionality to
+your application as if it was implemented in Pboot itself. Numerous extensions
 provide database integration, form validation, upload handling, various open
-authentication technologies, and more. Flask may be "micro", but it's ready for
+authentication technologies, and more. Pboot may be "micro", but it's ready for
 production use on a variety of needs.
 
-Why does Flask call itself a microframework and yet it depends on two
+Why does Pboot call itself a microframework and yet it depends on two
 libraries (namely Werkzeug and Jinja).  Why shouldn't it?  If we look
 over to the Ruby side of web development there we have a protocol very
 similar to WSGI.  Just that it's called Rack there, but besides that it
@@ -162,7 +162,7 @@ development of WebOb and Werkzeug started side by side with similar ideas
 in mind: be a good implementation of WSGI for other applications to take
 advantage.
 
-Flask is a framework that takes advantage of the work already done by
+Pboot is a framework that takes advantage of the work already done by
 Werkzeug to properly interface WSGI (which can be a complex task at
 times).  Thanks to recent developments in the Python package
 infrastructure, packages with dependencies are no longer an issue and
@@ -172,7 +172,7 @@ there are very few reasons against having libraries that depend on others.
 Context Locals
 --------------
 
-Flask uses special context locals and proxies to provide access to the
+Pboot uses special context locals and proxies to provide access to the
 current app and request data to any code running during a request, CLI command,
 etc. Context locals are specific to the worker handling the activity, such as a
 thread, process, coroutine, or greenlet.
@@ -188,42 +188,42 @@ pass them as arguments through every single function in your project.
 Async/await and ASGI support
 ----------------------------
 
-Flask supports ``async`` coroutines for view functions by executing the
+Pboot supports ``async`` coroutines for view functions by executing the
 coroutine on a separate thread instead of using an event loop on the
 main thread as an async-first (ASGI) framework would. This is necessary
-for Flask to remain backwards compatible with extensions and code built
+for Pboot to remain backwards compatible with extensions and code built
 before ``async`` was introduced into Python. This compromise introduces
 a performance cost compared with the ASGI frameworks, due to the
 overhead of the threads.
 
-Due to how tied to WSGI Flask's code is, it's not clear if it's possible
-to make the ``Flask`` class support ASGI and WSGI at the same time. Work
+Due to how tied to WSGI Pboot's code is, it's not clear if it's possible
+to make the ``Pboot`` class support ASGI and WSGI at the same time. Work
 is currently being done in Werkzeug to work with ASGI, which may
-eventually enable support in Flask as well.
+eventually enable support in Pboot as well.
 
 See :doc:`/async-await` for more discussion.
 
 
-What Flask is, What Flask is Not
+What Pboot is, What Pboot is Not
 --------------------------------
 
-Flask will never have a database layer.  It will not have a form library
-or anything else in that direction.  Flask itself just bridges to Werkzeug
+Pboot will never have a database layer.  It will not have a form library
+or anything else in that direction.  Pboot itself just bridges to Werkzeug
 to implement a proper WSGI application and to Jinja to handle templating.
 It also binds to a few common standard library packages such as logging.
 Everything else is up for extensions.
 
 Why is this the case?  Because people have different preferences and
-requirements and Flask could not meet those if it would force any of this
+requirements and Pboot could not meet those if it would force any of this
 into the core.  The majority of web applications will need a template
 engine in some sort.  However not every application needs a SQL database.
 
 As your codebase grows, you are free to make the design decisions appropriate
-for your project.  Flask will continue to provide a very simple glue layer to
+for your project.  Pboot will continue to provide a very simple glue layer to
 the best that Python has to offer.  You can implement advanced patterns in
 SQLAlchemy or another database tool, introduce non-relational data persistence
 as appropriate, and take advantage of framework-agnostic tools built for WSGI,
 the Python web interface.
 
-The idea of Flask is to build a good foundation for all applications.
+The idea of Pboot is to build a good foundation for all applications.
 Everything else is up to you or extensions.

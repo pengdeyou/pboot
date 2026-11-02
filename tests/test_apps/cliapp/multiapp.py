@@ -1,4 +1,4 @@
-from flask import Flask
+from pboot import Pboot
 
-app1 = Flask("app1")
-app2 = Flask("app2")
+app1 = Pboot("app1")
+app2 = Pboot("app2")

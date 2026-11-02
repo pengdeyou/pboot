@@ -19,8 +19,8 @@ Purpose of the Context
 The context and proxies help solve two development issues: circular imports, and
 passing around global data during a request.
 
-The :class:`.Flask` application object has attributes, such as
-:attr:`~.Flask.config`, that are useful to access within views and other
+The :class:`.Pboot` application object has attributes, such as
+:attr:`~.Pboot.config`, that are useful to access within views and other
 functions. However, importing the ``app`` instance within the modules in your
 project is prone to circular import issues. When using the
 :doc:`app factory pattern </patterns/appfactories>` or writing reusable
@@ -32,7 +32,7 @@ Because a *worker* handles only one request at a time, the request data can be
 considered global to that worker during that request. Passing it as an argument
 through every function during the request becomes verbose and redundant.
 
-Flask solves these issues with the *active context* pattern. Rather than
+Pboot solves these issues with the *active context* pattern. Rather than
 importing an ``app`` directly, or having to pass it and the request through to
 every single function, you import and access the proxies, which point to the
 currently active application and request data. This is sometimes referred to
@@ -55,12 +55,12 @@ outside an app context, you'll get this error message:
 
 If you see that error while configuring your application, such as when
 initializing an extension, you can push a context manually since you have direct
-access to the ``app``. Use :meth:`.Flask.app_context` in a ``with`` block.
+access to the ``app``. Use :meth:`.Pboot.app_context` in a ``with`` block.
 
 .. code-block:: python
 
     def create_app():
-        app = Flask(__name__)
+        app = Pboot(__name__)
 
         with app.app_context():
             init_db()
@@ -92,11 +92,11 @@ This will probably only happen during tests. If you see that error somewhere
 else in your code not related to testing, it most likely indicates that you
 should move that code into a view function.
 
-The primary way to solve this is to use :meth:`.Flask.test_client` to simulate
+The primary way to solve this is to use :meth:`.Pboot.test_client` to simulate
 a full request.
 
 If you only want to unit test one function, rather than a full request, use
-:meth:`.Flask.test_request_context` in a ``with`` block.
+:meth:`.Pboot.test_request_context` in a ``with`` block.
 
 .. code-block:: python
 
@@ -119,7 +119,7 @@ The context will have the same lifetime as an activity, such as a request, CLI
 command, or ``with`` block. Various callbacks and signals registered with the
 app will be run during the context.
 
-When a Flask application handles a request, it pushes a request context
+When a Pboot application handles a request, it pushes a request context
 to set the active application and request data. When it handles a CLI command,
 it pushes an app context to set the active application. When the activity ends,
 it pops that context. Proxy objects like :data:`.request`, :data:`.session`,
@@ -144,7 +144,7 @@ real object, rather than the proxy. Use the
 Lifecycle of the Context
 ------------------------
 
-Flask dispatches a request in multiple stages which can affect the request,
+Pboot dispatches a request in multiple stages which can affect the request,
 response, and how errors are handled. See :doc:`/lifecycle` for a list of all
 the steps, callbacks, and signals during each request. The following are the
 steps directly related to the context.
@@ -152,9 +152,9 @@ steps directly related to the context.
 -   The app context is pushed, the proxies are available.
 -   The :data:`.appcontext_pushed` signal is sent.
 -   The request is dispatched.
--   Any :meth:`.Flask.teardown_request` decorated functions are called.
+-   Any :meth:`.Pboot.teardown_request` decorated functions are called.
 -   The :data:`.request_tearing_down` signal is sent.
--   Any :meth:`.Flask.teardown_appcontext` decorated functions are called.
+-   Any :meth:`.Pboot.teardown_appcontext` decorated functions are called.
 -   The :data:`.appcontext_tearing_down` signal is sent.
 -   The app context is popped, the proxies are no longer available.
 -   The :data:`.appcontext_popped` signal is sent.
@@ -177,11 +177,11 @@ the contextvar so that access to any attributes and methods is forwarded to the
 object stored in the contextvar.
 
 The context is tracked like a stack, with the active context at the top of the
-stack. Flask manages pushing and popping contexts during requests, CLI commands,
+stack. Pboot manages pushing and popping contexts during requests, CLI commands,
 testing, ``with`` blocks, etc. The proxies access attributes on the active
 context.
 
 Because it is a stack, other contexts may be pushed to change the proxies during
 an already active context. This is not a common pattern, but can be used in
-advanced use cases. For example, a Flask application can be used as WSGI
-middleware, calling another wrapped Flask app from a view.
+advanced use cases. For example, a Pboot application can be used as WSGI
+middleware, calling another wrapped Pboot app from a view.

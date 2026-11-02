@@ -3,14 +3,14 @@ from __future__ import annotations
 import typing as t
 from http import HTTPStatus
 
-from flask import Flask
-from flask import jsonify
-from flask import stream_template
-from flask.templating import render_template
-from flask.views import View
-from flask.wrappers import Response
+from pboot import Pboot
+from pboot import jsonify
+from pboot import stream_template
+from pboot.templating import render_template
+from pboot.views import View
+from pboot.wrappers import Response
 
-app = Flask(__name__)
+app = Pboot(__name__)
 
 
 @app.route("/str")

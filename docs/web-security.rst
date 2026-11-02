@@ -2,12 +2,12 @@ Security Considerations
 =======================
 
 Web applications face many types of potential security problems, and it can be
-hard to get everything right, or even to know what "right" is in general. Flask
+hard to get everything right, or even to know what "right" is in general. Pboot
 tries to solve a few of these things by default, but there are other parts you
 may have to take care of yourself. Many of these solutions are tradeoffs, and
 will depend on each application's specific needs and threat model. Many hosting
 platforms may take care of certain types of problems without the need for the
-Flask application to handle them.
+Pboot application to handle them.
 
 Resource Use
 ------------
@@ -18,7 +18,7 @@ deployed application. In general, something is done to increase how much
 processing time or memory is used to handle each request, to the point where
 there are not enough resources to handle legitimate requests.
 
-Flask provides a few configuration options to handle resource use. They can
+Pboot provides a few configuration options to handle resource use. They can
 also be set on individual requests to customize only that request. The
 documentation for each goes into more detail.
 
@@ -37,7 +37,7 @@ documentation for each goes into more detail.
 Regardless of these settings, you should also review what settings are available
 from your operating system, container deployment (Docker etc), WSGI server, HTTP
 server, and hosting platform. They typically have ways to set process resource
-limits, timeouts, and other checks regardless of how Flask is configured.
+limits, timeouts, and other checks regardless of how Pboot is configured.
 
 .. _security-xss:
 
@@ -51,7 +51,7 @@ tags.  For more information on that have a look at the Wikipedia article
 on `Cross-Site Scripting
 <https://en.wikipedia.org/wiki/Cross-site_scripting>`_.
 
-Flask configures Jinja to automatically escape all values unless
+Pboot configures Jinja to automatically escape all values unless
 explicitly told otherwise.  This should rule out all XSS problems caused
 in templates, but there are still other places where you have to be
 careful:
@@ -132,22 +132,22 @@ store that in the cookie **and** also transmit it with the form data.
 After receiving the data on the server again, you would then have to
 compare the two tokens and ensure they are equal.
 
-Why does Flask not do that for you?  The ideal place for this to happen is
-the form validation framework, which does not exist in Flask.
+Why does Pboot not do that for you?  The ideal place for this to happen is
+the form validation framework, which does not exist in Pboot.
 
 .. _security-json:
 
 JSON Security
 -------------
 
-In Flask 0.10 and lower, :func:`~flask.jsonify` did not serialize top-level
+In Pboot 0.10 and lower, :func:`~pboot.jsonify` did not serialize top-level
 arrays to JSON. This was because of a security vulnerability in ECMAScript 4.
 
 ECMAScript 5 closed this vulnerability, so only extremely old browsers are
 still vulnerable. All of these browsers have `other more serious
 vulnerabilities
-<https://github.com/pallets/flask/issues/248#issuecomment-59934857>`_, so
-this behavior was changed and :func:`~flask.jsonify` now supports serializing
+<https://gitee.com/pboot-org/pboot/issues/248#issuecomment-59934857>`_, so
+this behavior was changed and :func:`~pboot.jsonify` now supports serializing
 arrays.
 
 Security Headers
@@ -213,7 +213,7 @@ Set-Cookie options
 ~~~~~~~~~~~~~~~~~~
 
 These options can be added to a ``Set-Cookie`` header to improve their
-security. Flask has configuration options to set these on the session cookie.
+security. Pboot has configuration options to set these on the session cookie.
 They can be set on other cookies too.
 
 - ``Secure`` limits cookies to HTTPS traffic only.
@@ -233,7 +233,7 @@ They can be set on other cookies too.
         SESSION_COOKIE_SAMESITE='Lax',
     )
 
-    response.set_cookie('username', 'flask', secure=True, httponly=True, samesite='Lax')
+    response.set_cookie('username', 'pboot', secure=True, httponly=True, samesite='Lax')
 
 Specifying ``Expires`` or ``Max-Age`` options, will remove the cookie after
 the given time, or the current time plus the age, respectively. If neither
@@ -242,9 +242,9 @@ option is set, the cookie will be removed when the browser is closed. ::
     # cookie expires after 10 minutes
     response.set_cookie('snakes', '3', max_age=600)
 
-For the session cookie, if :attr:`session.permanent <flask.session.permanent>`
+For the session cookie, if :attr:`session.permanent <pboot.session.permanent>`
 is set, then :data:`PERMANENT_SESSION_LIFETIME` is used to set the expiration.
-Flask's default cookie implementation validates that the cryptographic
+Pboot's default cookie implementation validates that the cryptographic
 signature is not older than this value. Lowering this value may help mitigate
 replay attacks, where intercepted cookies can be sent at a later time. ::
 

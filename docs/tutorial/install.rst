@@ -2,14 +2,14 @@ Make the Project Installable
 ============================
 
 Making your project installable means that you can build a *wheel* file and install that
-in another environment, just like you installed Flask in your project's environment.
+in another environment, just like you installed Pboot in your project's environment.
 This makes deploying your project the same as installing any other library, so you're
 using all the standard Python tools to manage everything.
 
 Installing also comes with other benefits that might not be obvious from
 the tutorial or as a new Python user, including:
 
-*   Currently, Python and Flask understand how to use the ``flaskr``
+*   Currently, Python and Pboot understand how to use the ``pbootr``
     package only because you're running from your project's directory.
     Installing means you can import it no matter where you run from.
 
@@ -33,11 +33,11 @@ The ``pyproject.toml`` file describes your project and how to build it.
     :caption: ``pyproject.toml``
 
     [project]
-    name = "flaskr"
+    name = "pbootr"
     version = "1.0.0"
-    description = "The basic blog app built in the Flask tutorial."
+    description = "The basic blog app built in the Pboot tutorial."
     dependencies = [
-        "flask",
+        "pboot",
     ]
 
     [build-system]
@@ -73,8 +73,8 @@ You can observe that the project is now installed with ``pip list``.
     Package        Version   Location
     -------------- --------- ----------------------------------
     click          6.7
-    Flask          1.0
-    flaskr         1.0.0     /home/user/Projects/flask-tutorial
+    Pboot          1.0
+    pbootr         1.0.0     /home/user/Projects/pboot-tutorial
     itsdangerous   0.24
     Jinja2         2.10
     MarkupSafe     1.0
@@ -82,8 +82,8 @@ You can observe that the project is now installed with ``pip list``.
     Werkzeug       0.14.1
 
 Nothing changes from how you've been running your project so far.
-``--app`` is still set to ``flaskr`` and ``flask run`` still runs
+``--app`` is still set to ``pbootr`` and ``pboot run`` still runs
 the application, but you can call it from anywhere, not just the
-``flask-tutorial`` directory.
+``pboot-tutorial`` directory.
 
 Continue to :doc:`tests`.

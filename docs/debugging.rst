@@ -43,7 +43,7 @@ The debugger is enabled by default when the development server is run in debug m
 
 .. code-block:: text
 
-    $ flask --app hello run --debug
+    $ pboot --app hello run --debug
 
 When running from Python code, passing ``debug=True`` enables debug mode, which is
 mostly equivalent.
@@ -66,13 +66,13 @@ be used to step through code during a request before an error is raised,
 or if no error is raised. Some even have a remote mode so you can debug
 code running on another machine.
 
-When using an external debugger, the app should still be in debug mode, otherwise Flask
+When using an external debugger, the app should still be in debug mode, otherwise Pboot
 turns unhandled errors into generic 500 error pages. However, the built-in debugger and
 reloader should be disabled so they don't interfere with the external debugger.
 
 .. code-block:: text
 
-    $ flask --app hello run --debug --no-debugger --no-reload
+    $ pboot --app hello run --debug --no-debugger --no-reload
 
 When running from Python:
 

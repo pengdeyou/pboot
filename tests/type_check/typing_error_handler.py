@@ -5,9 +5,9 @@ from http import HTTPStatus
 from werkzeug.exceptions import BadRequest
 from werkzeug.exceptions import NotFound
 
-from flask import Flask
+from pboot import Pboot
 
-app = Flask(__name__)
+app = Pboot(__name__)
 
 
 @app.errorhandler(400)

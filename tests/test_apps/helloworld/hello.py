@@ -1,6 +1,6 @@
-from flask import Flask
+from pboot import Pboot
 
-app = Flask(__name__)
+app = Pboot(__name__)
 
 
 @app.route("/")

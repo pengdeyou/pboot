@@ -1,13 +1,13 @@
 Templates
 =========
 
-Flask leverages Jinja as its template engine.  You are obviously free to use
+Pboot leverages Jinja as its template engine.  You are obviously free to use
 a different template engine, but you still have to install Jinja to run
-Flask itself.  This requirement is necessary to enable rich extensions.
+Pboot itself.  This requirement is necessary to enable rich extensions.
 An extension can depend on Jinja being present.
 
 This section only gives a very quick introduction into how Jinja
-is integrated into Flask.  If you want information on the template
+is integrated into Pboot.  If you want information on the template
 engine's syntax itself, head over to the official `Jinja Template
 Documentation <https://jinja.palletsprojects.com/templates/>`_ for
 more information.
@@ -15,16 +15,16 @@ more information.
 Jinja Setup
 -----------
 
-Unless customized, Jinja is configured by Flask as follows:
+Unless customized, Jinja is configured by Pboot as follows:
 
 -   autoescaping is enabled for all templates ending in ``.html``,
     ``.htm``, ``.xml``, ``.xhtml``, as well as ``.svg`` when using
-    :func:`~flask.templating.render_template`.
+    :func:`~pboot.templating.render_template`.
 -   autoescaping is enabled for all strings when using
-    :func:`~flask.templating.render_template_string`.
+    :func:`~pboot.templating.render_template_string`.
 -   a template has the ability to opt in/out autoescaping with the
     ``{% autoescape %}`` tag.
--   Flask inserts a couple of global functions and helpers into the
+-   Pboot inserts a couple of global functions and helpers into the
     Jinja context, additionally to the values that are present by
     default.
 
@@ -37,7 +37,7 @@ by default:
 .. data:: config
    :noindex:
 
-   The current configuration object (:data:`flask.Flask.config`)
+   The current configuration object (:data:`pboot.Pboot.config`)
 
    .. versionadded:: 0.6
 
@@ -47,33 +47,33 @@ by default:
 .. data:: request
    :noindex:
 
-   The current request object (:class:`flask.request`).  This variable is
+   The current request object (:class:`pboot.request`).  This variable is
    unavailable if the template was rendered without an active request
    context.
 
 .. data:: session
    :noindex:
 
-   The current session object (:class:`flask.session`).  This variable
+   The current session object (:class:`pboot.session`).  This variable
    is unavailable if the template was rendered without an active request
    context.
 
 .. data:: g
    :noindex:
 
-   The request-bound object for global variables (:data:`flask.g`).  This
+   The request-bound object for global variables (:data:`pboot.g`).  This
    variable is unavailable if the template was rendered without an active
    request context.
 
 .. function:: url_for
    :noindex:
 
-   The :func:`flask.url_for` function.
+   The :func:`pboot.url_for` function.
 
 .. function:: get_flashed_messages
    :noindex:
 
-   The :func:`flask.get_flashed_messages` function.
+   The :func:`pboot.get_flashed_messages` function.
 
 .. admonition:: The Jinja Context Behavior
 
@@ -140,11 +140,11 @@ using in this block.
 Registering Filters, Tests, and Globals
 ---------------------------------------
 
-The Flask app and blueprints provide decorators and methods to register your own
+The Pboot app and blueprints provide decorators and methods to register your own
 filters, tests, and global functions for use in Jinja templates. They all follow
 the same pattern, so the following examples only discuss filters.
 
-Decorate a function with :meth:`~.Flask.template_filter` to register it as a
+Decorate a function with :meth:`~.Pboot.template_filter` to register it as a
 template filter.
 
 .. code-block:: python
@@ -167,7 +167,7 @@ that can be changed by passing a name to the decorator.
     def reverse_filter(s):
         return reversed(s)
 
-A filter can be registered separately using :meth:`~.Flask.add_template_filter`.
+A filter can be registered separately using :meth:`~.Pboot.add_template_filter`.
 The name is optional and will use the function name if not given.
 
 .. code-block:: python
@@ -177,24 +177,24 @@ The name is optional and will use the function name if not given.
 
     app.add_template_filter(reverse_filter, "reverse")
 
-For template tests, use the :meth:`~.Flask.template_test` decorator or
-:meth:`~.Flask.add_template_test` method. For template global functions, use the
-:meth:`~.Flask.template_global` decorator or :meth:`~.Flask.add_template_global`
+For template tests, use the :meth:`~.Pboot.template_test` decorator or
+:meth:`~.Pboot.add_template_test` method. For template global functions, use the
+:meth:`~.Pboot.template_global` decorator or :meth:`~.Pboot.add_template_global`
 method.
 
 The same methods also exist on :class:`.Blueprint`, prefixed with ``app_`` to
 indicate that the registered functions will be available to all templates, not
 only when rendering from within the blueprint.
 
-The Jinja environment is also available as :attr:`~.Flask.jinja_env`. It may be
-modified directly, as you would when using Jinja outside Flask.
+The Jinja environment is also available as :attr:`~.Pboot.jinja_env`. It may be
+modified directly, as you would when using Jinja outside Pboot.
 
 
 Context Processors
 ------------------
 
 To inject new variables automatically into the context of a template,
-context processors exist in Flask.  Context processors run before the
+context processors exist in Pboot.  Context processors run before the
 template is rendered and have the ability to inject new values into the
 template context.  A context processor is a function that returns a
 dictionary.  The keys and values of this dictionary are then merged with
@@ -238,20 +238,20 @@ initial page load, or to save memory when rendering a very large
 template.
 
 The Jinja template engine supports rendering a template piece
-by piece, returning an iterator of strings. Flask provides the
-:func:`~flask.stream_template` and :func:`~flask.stream_template_string`
+by piece, returning an iterator of strings. Pboot provides the
+:func:`~pboot.stream_template` and :func:`~pboot.stream_template_string`
 functions to make this easier to use.
 
 .. code-block:: python
 
-    from flask import stream_template
+    from pboot import stream_template
 
     @app.get("/timeline")
     def timeline():
         return stream_template("timeline.html")
 
 These functions automatically apply the
-:func:`~flask.stream_with_context` wrapper if a request is active, so that
+:func:`~pboot.stream_with_context` wrapper if a request is active, so that
 :data:`.request`, :data:`.session`, and :data:`.g` remain available in the
 template.
 

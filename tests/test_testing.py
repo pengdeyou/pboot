@@ -3,13 +3,13 @@ import importlib.metadata
 import click
 import pytest
 
-import flask
-from flask import appcontext_popped
-from flask.cli import ScriptInfo
-from flask.globals import _cv_app
-from flask.json import jsonify
-from flask.testing import EnvironBuilder
-from flask.testing import FlaskCliRunner
+import pboot
+from pboot import appcontext_popped
+from pboot.cli import ScriptInfo
+from pboot.globals import _cv_app
+from pboot.json import jsonify
+from pboot.testing import EnvironBuilder
+from pboot.testing import PbootCliRunner
 
 
 def test_environ_defaults_from_config(app, client):
@@ -18,7 +18,7 @@ def test_environ_defaults_from_config(app, client):
 
     @app.route("/")
     def index():
-        return flask.request.url
+        return pboot.request.url
 
     ctx = app.test_request_context()
     assert ctx.request.url == "http://example.com:1234/foo/"
@@ -30,7 +30,7 @@ def test_environ_defaults_from_config(app, client):
 def test_environ_defaults(app, client, app_ctx, req_ctx):
     @app.route("/")
     def index():
-        return flask.request.url
+        return pboot.request.url
 
     ctx = app.test_request_context()
     assert ctx.request.url == "http://localhost/"
@@ -42,14 +42,14 @@ def test_environ_defaults(app, client, app_ctx, req_ctx):
 def test_environ_base_default(app, client):
     @app.route("/")
     def index():
-        flask.g.remote_addr = flask.request.remote_addr
-        flask.g.user_agent = str(flask.request.user_agent)
+        pboot.g.remote_addr = pboot.request.remote_addr
+        pboot.g.user_agent = str(pboot.request.user_agent)
         return ""
 
     with client:
         client.get("/")
-        assert flask.g.remote_addr == "127.0.0.1"
-        assert flask.g.user_agent == (
+        assert pboot.g.remote_addr == "127.0.0.1"
+        assert pboot.g.user_agent == (
             f"Werkzeug/{importlib.metadata.version('werkzeug')}"
         )
 
@@ -57,8 +57,8 @@ def test_environ_base_default(app, client):
 def test_environ_base_modified(app, client):
     @app.route("/")
     def index():
-        flask.g.remote_addr = flask.request.remote_addr
-        flask.g.user_agent = str(flask.request.user_agent)
+        pboot.g.remote_addr = pboot.request.remote_addr
+        pboot.g.user_agent = str(pboot.request.user_agent)
         return ""
 
     client.environ_base["REMOTE_ADDR"] = "192.168.0.22"
@@ -66,14 +66,14 @@ def test_environ_base_modified(app, client):
 
     with client:
         client.get("/")
-        assert flask.g.remote_addr == "192.168.0.22"
-        assert flask.g.user_agent == "Foo"
+        assert pboot.g.remote_addr == "192.168.0.22"
+        assert pboot.g.user_agent == "Foo"
 
 
 def test_client_open_environ(app, client, request):
     @app.route("/index")
     def index():
-        return flask.request.remote_addr
+        return pboot.request.remote_addr
 
     builder = EnvironBuilder(app, path="/index", method="GET")
 
@@ -89,7 +89,7 @@ def test_client_open_environ(app, client, request):
 def test_specify_url_scheme(app, client):
     @app.route("/")
     def index():
-        return flask.request.url
+        return pboot.request.url
 
     ctx = app.test_request_context(url_scheme="https")
     assert ctx.request.url == "https://localhost/"
@@ -114,16 +114,16 @@ def test_environbuilder_json_dumps(app):
 
 
 def test_blueprint_with_subdomain():
-    app = flask.Flask(__name__, subdomain_matching=True)
+    app = pboot.Pboot(__name__, subdomain_matching=True)
     app.config["SERVER_NAME"] = "example.com:1234"
     app.config["APPLICATION_ROOT"] = "/foo"
     client = app.test_client()
 
-    bp = flask.Blueprint("company", __name__, subdomain="xxx")
+    bp = pboot.Blueprint("company", __name__, subdomain="xxx")
 
     @bp.route("/")
     def index():
-        return flask.request.url
+        return pboot.request.url
 
     app.register_blueprint(bp)
 
@@ -140,24 +140,24 @@ def test_blueprint_with_subdomain():
 def test_redirect_session(app, client, app_ctx):
     @app.route("/redirect")
     def index():
-        flask.session["redirect"] = True
-        return flask.redirect("/target")
+        pboot.session["redirect"] = True
+        return pboot.redirect("/target")
 
     @app.route("/target")
     def get_session():
-        flask.session["target"] = True
+        pboot.session["target"] = True
         return ""
 
     with client:
         client.get("/redirect", follow_redirects=True)
-        assert flask.session["redirect"] is True
-        assert flask.session["target"] is True
+        assert pboot.session["redirect"] is True
+        assert pboot.session["target"] is True
 
 
 def test_session_transactions(app, client):
     @app.route("/")
     def index():
-        return str(flask.session["foo"])
+        return str(pboot.session["foo"])
 
     with client:
         with client.session_transaction() as sess:
@@ -177,7 +177,7 @@ def test_session_transaction_ipv6(app):
 
     @app.get("/")
     def index():
-        return str(flask.session.get("value"))
+        return str(pboot.session.get("value"))
 
     with client.session_transaction(base_url=base_url) as sess:
         sess["value"] = 42
@@ -186,7 +186,7 @@ def test_session_transaction_ipv6(app):
 
 
 def test_session_transactions_no_null_sessions():
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
 
     with app.test_client() as c:
         with pytest.raises(RuntimeError) as e:
@@ -197,10 +197,10 @@ def test_session_transactions_no_null_sessions():
 
 def test_session_transactions_keep_context(app, client, req_ctx):
     client.get("/")
-    req = flask.request._get_current_object()
+    req = pboot.request._get_current_object()
     assert req is not None
     with client.session_transaction():
-        assert req is flask.request._get_current_object()
+        assert req is pboot.request._get_current_object()
 
 
 def test_session_transaction_needs_cookies(app):
@@ -216,7 +216,7 @@ def test_test_client_context_binding(app, client):
 
     @app.route("/")
     def index():
-        flask.g.value = 42
+        pboot.g.value = 42
         return "Hello World!"
 
     @app.route("/other")
@@ -225,19 +225,19 @@ def test_test_client_context_binding(app, client):
 
     with client:
         resp = client.get("/")
-        assert flask.g.value == 42
+        assert pboot.g.value == 42
         assert resp.data == b"Hello World!"
         assert resp.status_code == 200
 
     with client:
         resp = client.get("/other")
-        assert not hasattr(flask.g, "value")
+        assert not hasattr(pboot.g, "value")
         assert b"Internal Server Error" in resp.data
         assert resp.status_code == 500
-        flask.g.value = 23
+        pboot.g.value = 23
 
     with pytest.raises(RuntimeError):
-        flask.g.value  # noqa: B018
+        pboot.g.value  # noqa: B018
 
 
 def test_reuse_client(client):
@@ -258,22 +258,22 @@ def test_full_url_request(app, client):
     with client:
         rv = client.post("http://domain.com/action?vodka=42", data={"gin": 43})
         assert rv.status_code == 200
-        assert "gin" in flask.request.form
-        assert "vodka" in flask.request.args
+        assert "gin" in pboot.request.form
+        assert "vodka" in pboot.request.args
 
 
 def test_json_request_and_response(app, client):
     @app.route("/echo", methods=["POST"])
     def echo():
-        return jsonify(flask.request.get_json())
+        return jsonify(pboot.request.get_json())
 
     with client:
         json_data = {"drink": {"gin": 1, "tonic": True}, "price": 10}
         rv = client.post("/echo", json=json_data)
 
         # Request should be in JSON
-        assert flask.request.is_json
-        assert flask.request.get_json() == json_data
+        assert pboot.request.is_json
+        assert pboot.request.get_json() == json_data
 
         # Response should be in JSON
         assert rv.status_code == 200
@@ -284,7 +284,7 @@ def test_json_request_and_response(app, client):
 def test_client_json_no_app_context(app, client):
     @app.route("/hello", methods=["POST"])
     def hello():
-        return f"Hello, {flask.request.json['name']}!"
+        return f"Hello, {pboot.request.json['name']}!"
 
     class Namespace:
         count = 0
@@ -295,14 +295,14 @@ def test_client_json_no_app_context(app, client):
     ns = Namespace()
 
     with appcontext_popped.connected_to(ns.add, app):
-        rv = client.post("/hello", json={"name": "Flask"})
+        rv = client.post("/hello", json={"name": "Pboot"})
 
-    assert rv.get_data(as_text=True) == "Hello, Flask!"
+    assert rv.get_data(as_text=True) == "Hello, Pboot!"
     assert ns.count == 1
 
 
 def test_subdomain():
-    app = flask.Flask(__name__, subdomain_matching=True)
+    app = pboot.Pboot(__name__, subdomain_matching=True)
     app.config["SERVER_NAME"] = "example.com"
     client = app.test_client()
 
@@ -311,7 +311,7 @@ def test_subdomain():
         return company_id
 
     with app.test_request_context():
-        url = flask.url_for("view", company_id="xxx")
+        url = pboot.url_for("view", company_id="xxx")
 
     with client:
         response = client.get(url)
@@ -328,7 +328,7 @@ def test_nosubdomain(app, client):
         return company_id
 
     with app.test_request_context():
-        url = flask.url_for("view", company_id="xxx")
+        url = pboot.url_for("view", company_id="xxx")
 
     with client:
         response = client.get(url)
@@ -339,9 +339,9 @@ def test_nosubdomain(app, client):
 
 def test_cli_runner_class(app):
     runner = app.test_cli_runner()
-    assert isinstance(runner, FlaskCliRunner)
+    assert isinstance(runner, PbootCliRunner)
 
-    class SubRunner(FlaskCliRunner):
+    class SubRunner(PbootCliRunner):
         pass
 
     app.test_cli_runner_class = SubRunner
@@ -385,7 +385,7 @@ def test_client_pop_all_preserved(app, req_ctx, client):
     @app.route("/")
     def index():
         # stream_with_context pushes a third context, preserved by response
-        return flask.stream_with_context("hello")
+        return pboot.stream_with_context("hello")
 
     # req_ctx fixture pushed an initial context
     with client:

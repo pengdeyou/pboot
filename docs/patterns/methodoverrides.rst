@@ -7,7 +7,7 @@ methods through another HTTP method in total violation of the protocol.
 
 The way this works is by letting the client do an HTTP POST request and
 set the ``X-HTTP-Method-Override`` header. Then the method is replaced
-with the header value before being passed to Flask.
+with the header value before being passed to Pboot.
 
 This can be accomplished with an HTTP middleware::
 
@@ -34,9 +34,9 @@ This can be accomplished with an HTTP middleware::
                 environ['CONTENT_LENGTH'] = '0'
             return self.app(environ, start_response)
 
-To use this with Flask, wrap the app object with the middleware::
+To use this with Pboot, wrap the app object with the middleware::
 
-    from flask import Flask
+    from pboot import Pboot
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)

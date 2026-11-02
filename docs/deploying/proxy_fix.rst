@@ -1,11 +1,11 @@
-Tell Flask it is Behind a Proxy
+Tell Pboot it is Behind a Proxy
 ===============================
 
 When using a reverse proxy, or many Python hosting platforms, the proxy
 will intercept and forward all external requests to the local WSGI
 server.
 
-From the WSGI server and Flask application's perspectives, requests are
+From the WSGI server and Pboot application's perspectives, requests are
 now coming from the HTTP server to the local address, rather than from
 the remote address to the external server address.
 

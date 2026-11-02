@@ -1,6 +1,6 @@
-import flask
-from flask.globals import app_ctx
-from flask.sessions import SessionInterface
+import pboot
+from pboot.globals import app_ctx
+from pboot.sessions import SessionInterface
 
 
 def test_open_session_with_endpoint():
@@ -17,7 +17,7 @@ def test_open_session_with_endpoint():
             app_ctx.match_request()
             assert request.endpoint is not None
 
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.session_interface = MySessionInterface()
 
     @app.get("/")

@@ -1,8 +1,8 @@
 import pytest
 
-import flask
-from flask.globals import app_ctx
-from flask.testing import FlaskClient
+import pboot
+from pboot.globals import app_ctx
+from pboot.testing import PbootClient
 
 
 def test_basic_url_generation(app):
@@ -14,31 +14,31 @@ def test_basic_url_generation(app):
         pass
 
     with app.app_context():
-        rv = flask.url_for("index")
+        rv = pboot.url_for("index")
         assert rv == "https://localhost/"
 
 
 def test_url_generation_requires_server_name(app):
     with app.app_context():
         with pytest.raises(RuntimeError):
-            flask.url_for("index")
+            pboot.url_for("index")
 
 
 def test_url_generation_without_context_fails():
     with pytest.raises(RuntimeError):
-        flask.url_for("index")
+        pboot.url_for("index")
 
 
 def test_request_context_means_app_context(app):
     with app.test_request_context():
-        assert flask.current_app._get_current_object() is app
-    assert not flask.current_app
+        assert pboot.current_app._get_current_object() is app
+    assert not pboot.current_app
 
 
 def test_app_context_provides_current_app(app):
     with app.app_context():
-        assert flask.current_app._get_current_object() is app
-    assert not flask.current_app
+        assert pboot.current_app._get_current_object() is app
+    assert not pboot.current_app
 
 
 def test_app_tearing_down(app):
@@ -102,7 +102,7 @@ def test_app_tearing_down_with_handled_exception_by_app_handler(app, client):
 
     @app.errorhandler(Exception)
     def handler(f):
-        return flask.jsonify(str(f))
+        return pboot.jsonify(str(f))
 
     with app.app_context():
         client.get("/")
@@ -136,25 +136,25 @@ def test_app_tearing_down_with_unhandled_exception(app, client):
 
 def test_app_ctx_globals_methods(app, app_ctx):
     # get
-    assert flask.g.get("foo") is None
-    assert flask.g.get("foo", "bar") == "bar"
+    assert pboot.g.get("foo") is None
+    assert pboot.g.get("foo", "bar") == "bar"
     # __contains__
-    assert "foo" not in flask.g
-    flask.g.foo = "bar"
-    assert "foo" in flask.g
+    assert "foo" not in pboot.g
+    pboot.g.foo = "bar"
+    assert "foo" in pboot.g
     # setdefault
-    flask.g.setdefault("bar", "the cake is a lie")
-    flask.g.setdefault("bar", "hello world")
-    assert flask.g.bar == "the cake is a lie"
+    pboot.g.setdefault("bar", "the cake is a lie")
+    pboot.g.setdefault("bar", "hello world")
+    assert pboot.g.bar == "the cake is a lie"
     # pop
-    assert flask.g.pop("bar") == "the cake is a lie"
+    assert pboot.g.pop("bar") == "the cake is a lie"
     with pytest.raises(KeyError):
-        flask.g.pop("bar")
-    assert flask.g.pop("bar", "more cake") == "more cake"
+        pboot.g.pop("bar")
+    assert pboot.g.pop("bar", "more cake") == "more cake"
     # __iter__
-    assert list(flask.g) == ["foo"]
+    assert list(pboot.g) == ["foo"]
     # __repr__
-    assert repr(flask.g) == "<flask.g of 'flask_test'>"
+    assert repr(pboot.g) == "<pboot.g of 'pboot_test'>"
 
 
 def test_custom_app_ctx_globals_class(app):
@@ -164,7 +164,7 @@ def test_custom_app_ctx_globals_class(app):
 
     app.app_ctx_globals_class = CustomRequestGlobals
     with app.app_context():
-        assert flask.render_template_string("{{ g.spam }}") == "eggs"
+        assert pboot.render_template_string("{{ g.spam }}") == "eggs"
 
 
 def test_context_refcounts(app, client):
@@ -183,7 +183,7 @@ def test_context_refcounts(app, client):
         with app_ctx:
             pass
 
-        assert flask.request.environ["werkzeug.request"] is not None
+        assert pboot.request.environ["werkzeug.request"] is not None
         return ""
 
     res = client.get("/")
@@ -205,13 +205,13 @@ def test_clean_pop(app):
         called.append("TEARDOWN")
 
     with app.app_context():
-        called.append(flask.current_app.name)
+        called.append(pboot.current_app.name)
 
-    assert called == ["flask_test", "TEARDOWN"]
-    assert not flask.current_app
+    assert called == ["pboot_test", "TEARDOWN"]
+    assert not pboot.current_app
 
 
-def test_robust_teardown(app: flask.Flask, client: FlaskClient) -> None:
+def test_robust_teardown(app: pboot.Pboot, client: PbootClient) -> None:
     count = 0
 
     @app.teardown_request
@@ -230,19 +230,19 @@ def test_robust_teardown(app: flask.Flask, client: FlaskClient) -> None:
     def index() -> str:
         return ""
 
-    def request_signal(sender: flask.Flask, exc: Exception | None) -> None:
+    def request_signal(sender: pboot.Pboot, exc: Exception | None) -> None:
         nonlocal count
         count += 1
         raise ValueError("request_signal")
 
-    def app_signal(sender: flask.Flask, exc: Exception | None) -> None:
+    def app_signal(sender: pboot.Pboot, exc: Exception | None) -> None:
         nonlocal count
         count += 1
         raise ValueError("app_signal")
 
     with (
-        flask.request_tearing_down.connected_to(request_signal, app),
-        flask.appcontext_tearing_down.connected_to(app_signal, app),
+        pboot.request_tearing_down.connected_to(request_signal, app),
+        pboot.appcontext_tearing_down.connected_to(app_signal, app),
     ):
         with pytest.raises(ExceptionGroup, match="context teardown") as exc_info:  # noqa: F821
             client.get()

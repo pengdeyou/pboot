@@ -66,7 +66,7 @@ The other way to get data from the server to JavaScript is to make a
 request for it. First, you need to know the URL to request.
 
 The simplest way to generate URLs is to continue to use
-:func:`~flask.url_for` when rendering the template. For example:
+:func:`~pboot.url_for` when rendering the template. For example:
 
 .. code-block:: javascript
 
@@ -120,13 +120,13 @@ option. The most common types for data are form data or JSON data.
 
 To send form data, pass a populated |FormData|_ object. This uses the
 same format as an HTML form, and would be accessed with ``request.form``
-in a Flask view.
+in a Pboot view.
 
 .. code-block:: javascript
 
     let data = new FormData()
-    data.append("name", "Flask Room")
-    data.append("description", "Talk about Flask here.")
+    data.append("name", "Pboot Room")
+    data.append("description", "Talk about Pboot here.")
     fetch(room_url, {
         "method": "POST",
         "body": data,
@@ -136,14 +136,14 @@ In general, prefer sending request data as form data, as would be used
 when submitting an HTML form. JSON can represent more complex data, but
 unless you need that it's better to stick with the simpler format. When
 sending JSON data, the ``Content-Type: application/json`` header must be
-sent as well, otherwise Flask will return a 415 Unsupported Media Type
+sent as well, otherwise Pboot will return a 415 Unsupported Media Type
 error.
 
 .. code-block:: javascript
 
     let data = {
-        "name": "Flask Room",
-        "description": "Talk about Flask here.",
+        "name": "Pboot Room",
+        "description": "Talk about Pboot here.",
     }
     fetch(room_url, {
         "method": "POST",
@@ -220,12 +220,12 @@ dict from the view. It will be serialized to JSON automatically.
         }
 
 If you want to return another JSON type, use the
-:func:`~flask.json.jsonify` function, which creates a response object
+:func:`~pboot.json.jsonify` function, which creates a response object
 with the given data serialized to JSON.
 
 .. code-block:: python
 
-    from flask import jsonify
+    from pboot import jsonify
 
     @app.route("/users")
     def user_list():
@@ -243,15 +243,15 @@ separate request to get the linked resource after getting the JSON.
 Receiving JSON in Views
 -----------------------
 
-Use the :attr:`~flask.Request.json` property of the
-:data:`~flask.request` object to decode the request's body as JSON. If
+Use the :attr:`~pboot.Request.json` property of the
+:data:`~pboot.request` object to decode the request's body as JSON. If
 the body is not valid JSON, a 400 Bad Request error will be raised. If
 the ``Content-Type`` header is not set to ``application/json``, a 415
 Unsupported Media Type error will be raised.
 
 .. code-block:: python
 
-    from flask import request
+    from pboot import request
 
     @app.post("/user/<int:id>")
     def user_update(id):

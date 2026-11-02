@@ -5,15 +5,15 @@ If you'd like to use an ASGI server you will need to utilise WSGI to
 ASGI middleware. The asgiref
 `WsgiToAsgi <https://github.com/django/asgiref#wsgi-to-asgi-adapter>`_
 adapter is recommended as it integrates with the event loop used for
-Flask's :ref:`async_await` support. You can use the adapter by
-wrapping the Flask app,
+Pboot's :ref:`async_await` support. You can use the adapter by
+wrapping the Pboot app,
 
 .. code-block:: python
 
     from asgiref.wsgi import WsgiToAsgi
-    from flask import Flask
+    from pboot import Pboot
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
 
     ...
 

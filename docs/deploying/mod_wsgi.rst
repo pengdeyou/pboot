@@ -43,7 +43,7 @@ Running
 -------
 
 The only argument to ``mod_wsgi-express`` specifies a script containing
-your Flask application, which must be called ``application``. You can
+your Pboot application, which must be called ``application``. You can
 write a small script to import your app with this name, or to create it
 if using the app factory pattern.
 

@@ -2,23 +2,23 @@ import os
 
 import pytest
 
-import flask
+import pboot
 
 
 def test_explicit_instance_paths(modules_tmp_path):
     with pytest.raises(ValueError, match=".*must be absolute"):
-        flask.Flask(__name__, instance_path="instance")
+        pboot.Pboot(__name__, instance_path="instance")
 
-    app = flask.Flask(__name__, instance_path=os.fspath(modules_tmp_path))
+    app = pboot.Pboot(__name__, instance_path=os.fspath(modules_tmp_path))
     assert app.instance_path == os.fspath(modules_tmp_path)
 
 
 def test_uninstalled_module_paths(modules_tmp_path, purge_module):
     (modules_tmp_path / "config_module_app.py").write_text(
         "import os\n"
-        "import flask\n"
+        "import pboot\n"
         "here = os.path.abspath(os.path.dirname(__file__))\n"
-        "app = flask.Flask(__name__)\n"
+        "app = pboot.Pboot(__name__)\n"
     )
     purge_module("config_module_app")
 
@@ -32,9 +32,9 @@ def test_uninstalled_package_paths(modules_tmp_path, purge_module):
     app.mkdir()
     (app / "__init__.py").write_text(
         "import os\n"
-        "import flask\n"
+        "import pboot\n"
         "here = os.path.abspath(os.path.dirname(__file__))\n"
-        "app = flask.Flask(__name__)\n"
+        "app = pboot.Pboot(__name__)\n"
     )
     purge_module("config_package_app")
 
@@ -49,7 +49,7 @@ def test_uninstalled_namespace_paths(tmp_path, monkeypatch, purge_module):
         monkeypatch.syspath_prepend(os.fspath(project))
         ns = project / "namespace" / package
         ns.mkdir(parents=True)
-        (ns / "__init__.py").write_text("import flask\napp = flask.Flask(__name__)\n")
+        (ns / "__init__.py").write_text("import pboot\napp = pboot.Pboot(__name__)\n")
         return project
 
     _ = create_namespace("package1")
@@ -66,7 +66,7 @@ def test_installed_module_paths(
     modules_tmp_path, modules_tmp_path_prefix, purge_module, site_packages
 ):
     (site_packages / "site_app.py").write_text(
-        "import flask\napp = flask.Flask(__name__)\n"
+        "import pboot\napp = pboot.Pboot(__name__)\n"
     )
     purge_module("site_app")
 
@@ -86,7 +86,7 @@ def test_installed_package_paths(
 
     app = installed_path / "installed_package"
     app.mkdir()
-    (app / "__init__.py").write_text("import flask\napp = flask.Flask(__name__)\n")
+    (app / "__init__.py").write_text("import pboot\napp = pboot.Pboot(__name__)\n")
     purge_module("installed_package")
 
     from installed_package import app
@@ -101,7 +101,7 @@ def test_prefix_package_paths(
 ):
     app = site_packages / "site_package"
     app.mkdir()
-    (app / "__init__.py").write_text("import flask\napp = flask.Flask(__name__)\n")
+    (app / "__init__.py").write_text("import pboot\napp = pboot.Pboot(__name__)\n")
     purge_module("site_package")
 
     import site_package

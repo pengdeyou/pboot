@@ -4,7 +4,7 @@ Adding a favicon
 A "favicon" is an icon used by browsers for tabs and bookmarks. This helps
 to distinguish your website and to give it a unique brand.
 
-A common question is how to add a favicon to a Flask application. First, of
+A common question is how to add a favicon to a Pboot application. First, of
 course, you need an icon. It should be 16 × 16 pixels and in the ICO file
 format. This is not a requirement but a de-facto standard supported by all
 relevant browsers. Put the icon in your static directory as
@@ -31,10 +31,10 @@ however your application is the root you can simply route a redirect::
     )
 
 If you want to save the extra redirect request you can also write a view
-using :func:`~flask.send_from_directory`::
+using :func:`~pboot.send_from_directory`::
 
     import os
-    from flask import send_from_directory
+    from pboot import send_from_directory
 
     @app.route('/favicon.ico')
     def favicon():

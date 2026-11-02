@@ -4,10 +4,10 @@ from pallets_sphinx_themes import ProjectLink
 
 # Project --------------------------------------------------------------
 
-project = "Flask"
-copyright = "2010 Pallets"
-author = "Pallets"
-release, version = get_version("Flask")
+project = "Pboot"
+copyright = "2010 Pallets, 2026 pboot-org"
+author = "pboot-org"
+release, version = get_version("pboot")
 
 # General --------------------------------------------------------------
 
@@ -24,9 +24,9 @@ autodoc_member_order = "bysource"
 autodoc_typehints = "description"
 autodoc_preserve_defaults = True
 extlinks = {
-    "issue": ("https://github.com/pallets/flask/issues/%s", "#%s"),
-    "pr": ("https://github.com/pallets/flask/pull/%s", "#%s"),
-    "ghsa": ("https://github.com/pallets/flask/security/advisories/GHSA-%s", "GHSA-%s"),
+    "issue": ("https://gitee.com/pboot-org/pboot/issues/%s", "#%s"),
+    "pr": ("https://gitee.com/pboot-org/pboot/pulls/%s", "#%s"),
+    "ghsa": ("https://gitee.com/pboot-org/pboot/security/advisories/GHSA-%s", "GHSA-%s"),
 }
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
@@ -45,11 +45,11 @@ html_theme = "flask"
 html_theme_options = {"index_sidebar_logo": False}
 html_context = {
     "project_links": [
-        ProjectLink("Donate", "https://palletsprojects.com/donate"),
-        ProjectLink("PyPI Releases", "https://pypi.org/project/Flask/"),
-        ProjectLink("Source Code", "https://github.com/pallets/flask/"),
-        ProjectLink("Issue Tracker", "https://github.com/pallets/flask/issues/"),
-        ProjectLink("Chat", "https://discord.gg/pallets"),
+        ProjectLink("Donate", "https://gitee.com/pboot-org/pboot"),
+        ProjectLink("PyPI Releases", "https://pypi.org/project/pboot/"),
+        ProjectLink("Source Code", "https://gitee.com/pboot-org/pboot/"),
+        ProjectLink("Issue Tracker", "https://gitee.com/pboot-org/pboot/issues/"),
+        ProjectLink("Chat", "https://gitee.com/pboot-org/pboot/issues"),
     ]
 }
 html_sidebars = {
@@ -58,9 +58,9 @@ html_sidebars = {
 }
 singlehtml_sidebars = {"index": ["project.html", "localtoc.html", "ethicalads.html"]}
 html_static_path = ["_static"]
-html_favicon = "_static/flask-icon.svg"
-html_logo = "_static/flask-logo.svg"
-html_title = f"Flask Documentation ({version})"
+html_favicon = "_static/pboot-icon.svg"
+html_logo = "_static/pboot-logo.svg"
+html_title = f"Pboot Documentation ({version})"
 html_show_sourcelink = False
 
 gettext_uuid = True
@@ -72,7 +72,7 @@ gettext_compact = False
 def github_link(name, rawtext, text, lineno, inliner, options=None, content=None):
     app = inliner.document.settings.env.app
     release = app.config.release
-    base_url = "https://github.com/pallets/flask/tree/"
+    base_url = "https://gitee.com/pboot-org/pboot/tree/"
 
     if text.endswith(">"):
         words, text = text[:-1].rsplit("<", 1)

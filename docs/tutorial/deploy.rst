@@ -22,7 +22,7 @@ When you want to deploy your application elsewhere, you build a *wheel*
     $ pip install build
     $ python -m build --wheel
 
-You can find the file in ``dist/flaskr-1.0.0-py3-none-any.whl``. The
+You can find the file in ``dist/pbootr-1.0.0-py3-none-any.whl``. The
 file name is in the format of {project name}-{version}-{python tag}
 -{abi tag}-{platform tag}.
 
@@ -32,7 +32,7 @@ file with ``pip``.
 
 .. code-block:: none
 
-    $ pip install flaskr-1.0.0-py3-none-any.whl
+    $ pip install pbootr-1.0.0-py3-none-any.whl
 
 Pip will install your project along with its dependencies.
 
@@ -41,11 +41,11 @@ create the database in the instance folder.
 
     .. code-block:: text
 
-        $ flask --app flaskr init-db
+        $ pboot --app pbootr init-db
 
-When Flask detects that it's installed (not in editable mode), it uses
+When Pboot detects that it's installed (not in editable mode), it uses
 a different directory for the instance folder. You can find it at
-``.venv/var/flaskr-instance`` instead.
+``.venv/var/pbootr-instance`` instead.
 
 
 Configure the Secret Key
@@ -68,19 +68,19 @@ Create the ``config.py`` file in the instance folder, which the factory
 will read from if it exists. Copy the generated value into it.
 
 .. code-block:: python
-    :caption: ``.venv/var/flaskr-instance/config.py``
+    :caption: ``.venv/var/pbootr-instance/config.py``
 
     SECRET_KEY = '192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf'
 
 You can also set any other necessary configuration here, although
-``SECRET_KEY`` is the only one needed for Flaskr.
+``SECRET_KEY`` is the only one needed for Pbootr.
 
 
 Run with a Production Server
 ----------------------------
 
 When running publicly rather than in development, you should not use the
-built-in development server (``flask run``). The development server is
+built-in development server (``pboot run``). The development server is
 provided by Werkzeug for convenience, but is not designed to be
 particularly efficient, stable, or secure.
 
@@ -92,12 +92,12 @@ first install it in the virtual environment:
     $ pip install waitress
 
 You need to tell Waitress about your application, but it doesn't use
-``--app`` like ``flask run`` does. You need to tell it to import and
+``--app`` like ``pboot run`` does. You need to tell it to import and
 call the application factory to get an application object.
 
 .. code-block:: none
 
-    $ waitress-serve --call 'flaskr:create_app'
+    $ waitress-serve --call 'pbootr:create_app'
 
     Serving on http://0.0.0.0:8080
 

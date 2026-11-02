@@ -25,7 +25,7 @@ Basic Factories
 The idea is to set up the application in a function.  Like this::
 
     def create_app(config_filename):
-        app = Flask(__name__)
+        app = Pboot(__name__)
         app.config.from_pyfile(config_filename)
 
         from yourapplication.model import db
@@ -41,9 +41,9 @@ The idea is to set up the application in a function.  Like this::
 The downside is that you cannot use the application object in the blueprints
 at import time.  You can however use it from within a request.  How do you
 get access to the application with the config?  Use
-:data:`~flask.current_app`::
+:data:`~pboot.current_app`::
 
-    from flask import current_app, Blueprint, render_template
+    from pboot import current_app, Blueprint, render_template
     admin = Blueprint('admin', __name__, url_prefix='/admin')
 
     @admin.route('/')
@@ -62,7 +62,7 @@ Using `Flask-SQLAlchemy <https://flask-sqlalchemy.palletsprojects.com/>`_,
 as an example, you should not do something along those lines::
 
     def create_app(config_filename):
-        app = Flask(__name__)
+        app = Pboot(__name__)
         app.config.from_pyfile(config_filename)
 
         db = SQLAlchemy(app)
@@ -74,7 +74,7 @@ But, rather, in model.py (or equivalent)::
 and in your application.py (or equivalent)::
 
     def create_app(config_filename):
-        app = Flask(__name__)
+        app = Pboot(__name__)
         app.config.from_pyfile(config_filename)
 
         from yourapplication.model import db
@@ -87,19 +87,19 @@ For more information about the design of extensions refer to :doc:`/extensiondev
 Using Applications
 ------------------
 
-To run such an application, you can use the :command:`flask` command:
+To run such an application, you can use the :command:`pboot` command:
 
 .. code-block:: text
 
-    $ flask --app hello run
+    $ pboot --app hello run
 
-Flask will automatically detect the factory if it is named
+Pboot will automatically detect the factory if it is named
 ``create_app`` or ``make_app`` in ``hello``. You can also pass arguments
 to the factory like this:
 
 .. code-block:: text
 
-    $ flask --app 'hello:create_app(local_auth=True)' run
+    $ pboot --app 'hello:create_app(local_auth=True)' run
 
 Then the ``create_app`` factory in ``hello`` is called with the keyword
 argument ``local_auth=True``. See :doc:`/cli` for more detail.

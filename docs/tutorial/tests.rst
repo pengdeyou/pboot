@@ -1,10 +1,10 @@
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
 Test Coverage
 =============
 
 Writing unit tests for your application lets you check that the code
-you wrote works the way you expect. Flask provides a test client that
+you wrote works the way you expect. Pboot provides a test client that
 simulates requests to the application and returns the response data.
 
 You should test as much of your code as possible. Code in functions only
@@ -38,7 +38,7 @@ Setup and Fixtures
 ------------------
 
 The test code is located in the ``tests`` directory. This directory is
-*next to* the ``flaskr`` package, not inside it. The
+*next to* the ``pbootr`` package, not inside it. The
 ``tests/conftest.py`` file contains setup functions called *fixtures*
 that each test will use. Tests are in Python modules that start with
 ``test_``, and each test function in those modules also starts with
@@ -71,8 +71,8 @@ local development configuration.
     import tempfile
 
     import pytest
-    from flaskr import create_app
-    from flaskr.db import get_db, init_db
+    from pbootr import create_app
+    from pbootr.db import get_db, init_db
 
     with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
         _data_sql = f.read().decode('utf8')
@@ -113,17 +113,17 @@ folder. After setting the path, the database tables are created and the
 test data is inserted. After the test is over, the temporary file is
 closed and removed.
 
-:data:`TESTING` tells Flask that the app is in test mode. Flask changes
+:data:`TESTING` tells Pboot that the app is in test mode. Pboot changes
 some internal behavior so it's easier to test, and other extensions can
 also use the flag to make testing them easier.
 
 The ``client`` fixture calls
-:meth:`app.test_client() <Flask.test_client>` with the application
+:meth:`app.test_client() <Pboot.test_client>` with the application
 object created by the ``app`` fixture. Tests will use the client to make
 requests to the application without running the server.
 
 The ``runner`` fixture is similar to ``client``.
-:meth:`app.test_cli_runner() <Flask.test_cli_runner>` creates a runner
+:meth:`app.test_cli_runner() <Pboot.test_cli_runner>` creates a runner
 that can call the Click commands registered with the application.
 
 Pytest uses fixtures by matching their function names with the names
@@ -147,7 +147,7 @@ configuration should be overridden.
 .. code-block:: python
     :caption: ``tests/test_factory.py``
 
-    from flaskr import create_app
+    from pbootr import create_app
 
 
     def test_config():
@@ -177,7 +177,7 @@ should be closed.
     import sqlite3
 
     import pytest
-    from flaskr.db import get_db
+    from pbootr.db import get_db
 
 
     def test_get_close_db(app):
@@ -203,7 +203,7 @@ a message.
         def fake_init_db():
             Recorder.called = True
 
-        monkeypatch.setattr('flaskr.db.init_db', fake_init_db)
+        monkeypatch.setattr('pbootr.db.init_db', fake_init_db)
         result = runner.invoke(args=['init-db'])
         assert 'Initialized' in result.output
         assert Recorder.called
@@ -257,8 +257,8 @@ messages.
     :caption: ``tests/test_auth.py``
 
     import pytest
-    from flask import g, session
-    from flaskr.db import get_db
+    from pboot import g, session
+    from pbootr.db import get_db
 
 
     def test_register(client, app):
@@ -287,13 +287,13 @@ messages.
         assert message in response.data
 
 :meth:`client.get() <werkzeug.test.Client.get>` makes a ``GET`` request
-and returns the :class:`Response` object returned by Flask. Similarly,
+and returns the :class:`Response` object returned by Pboot. Similarly,
 :meth:`client.post() <werkzeug.test.Client.post>` makes a ``POST``
 request, converting the ``data`` dict into form data.
 
 To test that the page renders successfully, a simple request is made and
 checked for a ``200 OK`` :attr:`~Response.status_code`. If
-rendering failed, Flask would return a ``500 Internal Server Error``
+rendering failed, Pboot would return a ``500 Internal Server Error``
 code.
 
 :attr:`~Response.headers` will have a ``Location`` header with the login
@@ -372,7 +372,7 @@ register. When logged in, there's a link to log out.
     :caption: ``tests/test_blog.py``
 
     import pytest
-    from flaskr.db import get_db
+    from pbootr.db import get_db
 
 
     def test_index(client, auth):
@@ -501,7 +501,7 @@ less verbose, can be added to the project's ``pyproject.toml`` file.
 
     [tool.coverage.run]
     branch = true
-    source = ["flaskr"]
+    source = ["pbootr"]
 
 To run the tests, use the ``pytest`` command. It will find and run all
 the test functions you've written.
@@ -512,7 +512,7 @@ the test functions you've written.
 
     ========================= test session starts ==========================
     platform linux -- Python 3.6.4, pytest-3.5.0, py-1.5.3, pluggy-0.6.0
-    rootdir: /home/user/Projects/flask-tutorial
+    rootdir: /home/user/Projects/pboot-tutorial
     collected 23 items
 
     tests/test_auth.py ........                                      [ 34%]
@@ -540,10 +540,10 @@ You can either view a simple coverage report in the terminal:
 
     Name                 Stmts   Miss Branch BrPart  Cover
     ------------------------------------------------------
-    flaskr/__init__.py      21      0      2      0   100%
-    flaskr/auth.py          54      0     22      0   100%
-    flaskr/blog.py          54      0     16      0   100%
-    flaskr/db.py            24      0      4      0   100%
+    pbootr/__init__.py      21      0      2      0   100%
+    pbootr/auth.py          54      0     22      0   100%
+    pbootr/blog.py          54      0     16      0   100%
+    pbootr/db.py            24      0      4      0   100%
     ------------------------------------------------------
     TOTAL                  153      0     44      0   100%
 

@@ -15,7 +15,7 @@ forms.
 .. admonition:: Getting the most out of WTForms with an Extension
 
    The `Flask-WTF`_ extension expands on this pattern and adds a
-   few little helpers that make working with forms and Flask more
+   few little helpers that make working with forms and Pboot more
    fun.  You can get it from `PyPI
    <https://pypi.org/project/Flask-WTF/>`_.
 
@@ -60,9 +60,9 @@ the code as necessary.
 
 Things to remember:
 
-1. create the form from the request :attr:`~flask.request.form` value if
+1. create the form from the request :attr:`~pboot.request.form` value if
    the data is submitted via the HTTP ``POST`` method and
-   :attr:`~flask.request.args` if the data is submitted as ``GET``.
+   :attr:`~pboot.request.args` if the data is submitted as ``GET``.
 2. to validate the data, call the :func:`~wtforms.form.Form.validate`
    method, which will return ``True`` if the data validates, ``False``
    otherwise.

@@ -1,4 +1,4 @@
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
 Templates
 =========
@@ -8,15 +8,15 @@ you're running the server and try to go to any of the URLs, you'll see a
 ``TemplateNotFound`` error. That's because the views are calling
 :func:`render_template`, but you haven't written the templates yet.
 The template files will be stored in the ``templates`` directory inside
-the ``flaskr`` package.
+the ``pbootr`` package.
 
 Templates are files that contain static data as well as placeholders
 for dynamic data. A template is rendered with specific data to produce a
-final document. Flask uses the `Jinja`_ template library to render
+final document. Pboot uses the `Jinja`_ template library to render
 templates.
 
 In your application, you will use templates to render `HTML`_ which
-will display in the user's browser. In Flask, Jinja is configured to
+will display in the user's browser. In Pboot, Jinja is configured to
 *autoescape* any data that is rendered in HTML templates. This means
 that it's safe to render user input; any characters they've entered that
 could mess with the HTML, such as ``<`` and ``>`` will be *escaped* with
@@ -44,13 +44,13 @@ template, each template will *extend* a base template and override
 specific sections.
 
 .. code-block:: html+jinja
-    :caption: ``flaskr/templates/base.html``
+    :caption: ``pbootr/templates/base.html``
 
     <!doctype html>
-    <title>{% block title %}{% endblock %} - Flaskr</title>
+    <title>{% block title %}{% endblock %} - Pbootr</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <nav>
-      <h1>Flaskr</h1>
+      <h1>Pbootr</h1>
       <ul>
         {% if g.user %}
           <li><span>{{ g.user['username'] }}</span>
@@ -103,7 +103,7 @@ Register
 --------
 
 .. code-block:: html+jinja
-    :caption: ``flaskr/templates/auth/register.html``
+    :caption: ``pbootr/templates/auth/register.html``
 
     {% extends 'base.html' %}
 
@@ -135,7 +135,7 @@ The ``input`` tags are using the ``required`` attribute here. This tells
 the browser not to submit the form until those fields are filled in. If
 the user is using an older browser that doesn't support that attribute,
 or if they are using something besides a browser to make requests, you
-still want to validate the data in the Flask view. It's important to
+still want to validate the data in the Pboot view. It's important to
 always fully validate the data on the server, even if the client does
 some validation as well.
 
@@ -147,7 +147,7 @@ This is identical to the register template except for the title and
 submit button.
 
 .. code-block:: html+jinja
-    :caption: ``flaskr/templates/auth/login.html``
+    :caption: ``pbootr/templates/auth/login.html``
 
     {% extends 'base.html' %}
 
@@ -170,7 +170,7 @@ Register A User
 ---------------
 
 Now that the authentication templates are written, you can register a
-user. Make sure the server is still running (``flask run`` if it's not),
+user. Make sure the server is still running (``pboot run`` if it's not),
 then go to http://127.0.0.1:5000/auth/register.
 
 Try clicking the "Register" button without filling out the form and see

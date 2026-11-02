@@ -1,7 +1,7 @@
 import pytest
 
-import flask.views
-from flask.testing import FlaskClient
+import pboot.views
+from pboot.testing import PbootClient
 
 
 def common_test(app):
@@ -15,18 +15,18 @@ def common_test(app):
 
 
 def test_basic_view(app):
-    class Index(flask.views.View):
+    class Index(pboot.views.View):
         methods = ["GET", "POST"]
 
         def dispatch_request(self):
-            return flask.request.method
+            return pboot.request.method
 
     app.add_url_rule("/", view_func=Index.as_view("index"))
     common_test(app)
 
 
 def test_method_based_view(app):
-    class Index(flask.views.MethodView):
+    class Index(pboot.views.MethodView):
         def get(self):
             return "GET"
 
@@ -39,7 +39,7 @@ def test_method_based_view(app):
 
 
 def test_view_patching(app):
-    class Index(flask.views.MethodView):
+    class Index(pboot.views.MethodView):
         def get(self):
             raise ZeroDivisionError
 
@@ -60,7 +60,7 @@ def test_view_patching(app):
 
 
 def test_view_inheritance(app, client):
-    class Index(flask.views.MethodView):
+    class Index(pboot.views.MethodView):
         def get(self):
             return "GET"
 
@@ -80,13 +80,13 @@ def test_view_inheritance(app, client):
 def test_view_decorators(app, client):
     def add_x_parachute(f):
         def new_function(*args, **kwargs):
-            resp = flask.make_response(f(*args, **kwargs))
+            resp = pboot.make_response(f(*args, **kwargs))
             resp.headers["X-Parachute"] = "awesome"
             return resp
 
         return new_function
 
-    class Index(flask.views.View):
+    class Index(pboot.views.View):
         decorators = [add_x_parachute]
 
         def dispatch_request(self):
@@ -99,11 +99,11 @@ def test_view_decorators(app, client):
 
 
 def test_view_provide_automatic_options_attr_disable(
-    app: flask.Flask, client: FlaskClient
+    app: pboot.Pboot, client: PbootClient
 ) -> None:
     """Automatic options can be disabled by the view class attribute."""
 
-    class Index(flask.views.View):
+    class Index(pboot.views.View):
         provide_automatic_options = False
 
         def dispatch_request(self):
@@ -115,14 +115,14 @@ def test_view_provide_automatic_options_attr_disable(
 
 
 def test_view_provide_automatic_options_attr_enable(
-    app: flask.Flask, client: FlaskClient
+    app: pboot.Pboot, client: PbootClient
 ) -> None:
     """When default automatic options is disabled in config, it can still be
     enabled by the view class attribute.
     """
     app.config["PROVIDE_AUTOMATIC_OPTIONS"] = False
 
-    class Index(flask.views.View):
+    class Index(pboot.views.View):
         provide_automatic_options = True
 
         def dispatch_request(self):
@@ -134,11 +134,11 @@ def test_view_provide_automatic_options_attr_enable(
 
 
 def test_provide_automatic_options_method_disable(
-    app: flask.Flask, client: FlaskClient
+    app: pboot.Pboot, client: PbootClient
 ) -> None:
     """Automatic options is ignored if the route handles options."""
 
-    class Index(flask.views.View):
+    class Index(pboot.views.View):
         methods = ["OPTIONS"]
 
         def dispatch_request(self):
@@ -150,9 +150,9 @@ def test_provide_automatic_options_method_disable(
 
 
 def test_implicit_head(app, client):
-    class Index(flask.views.MethodView):
+    class Index(pboot.views.MethodView):
         def get(self):
-            return flask.Response("Blub", headers={"X-Method": flask.request.method})
+            return pboot.Response("Blub", headers={"X-Method": pboot.request.method})
 
     app.add_url_rule("/", view_func=Index.as_view("index"))
     rv = client.get("/")
@@ -164,12 +164,12 @@ def test_implicit_head(app, client):
 
 
 def test_explicit_head(app, client):
-    class Index(flask.views.MethodView):
+    class Index(pboot.views.MethodView):
         def get(self):
             return "GET"
 
         def head(self):
-            return flask.Response("", headers={"X-Method": "HEAD"})
+            return pboot.Response("", headers={"X-Method": "HEAD"})
 
     app.add_url_rule("/", view_func=Index.as_view("index"))
     rv = client.get("/")
@@ -182,11 +182,11 @@ def test_explicit_head(app, client):
 def test_endpoint_override(app):
     app.debug = True
 
-    class Index(flask.views.View):
+    class Index(pboot.views.View):
         methods = ["GET", "POST"]
 
         def dispatch_request(self):
-            return flask.request.method
+            return pboot.request.method
 
     app.add_url_rule("/", view_func=Index.as_view("index"))
 
@@ -198,7 +198,7 @@ def test_endpoint_override(app):
 
 
 def test_methods_var_inheritance(app, client):
-    class BaseView(flask.views.MethodView):
+    class BaseView(pboot.views.MethodView):
         methods = ["GET", "PROPFIND"]
 
     class ChildView(BaseView):
@@ -216,11 +216,11 @@ def test_methods_var_inheritance(app, client):
 
 
 def test_multiple_inheritance(app, client):
-    class GetView(flask.views.MethodView):
+    class GetView(pboot.views.MethodView):
         def get(self):
             return "GET"
 
-    class DeleteView(flask.views.MethodView):
+    class DeleteView(pboot.views.MethodView):
         def delete(self):
             return "DELETE"
 
@@ -235,11 +235,11 @@ def test_multiple_inheritance(app, client):
 
 
 def test_remove_method_from_parent(app, client):
-    class GetView(flask.views.MethodView):
+    class GetView(pboot.views.MethodView):
         def get(self):
             return "GET"
 
-    class OtherView(flask.views.MethodView):
+    class OtherView(pboot.views.MethodView):
         def post(self):
             return "POST"
 
@@ -256,7 +256,7 @@ def test_remove_method_from_parent(app, client):
 def test_init_once(app, client):
     n = 0
 
-    class CountInit(flask.views.View):
+    class CountInit(pboot.views.View):
         init_every_request = False
 
         def __init__(self):

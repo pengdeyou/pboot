@@ -1,5 +1,5 @@
-from flask import Blueprint
-from flask import render_template
+from pboot import Blueprint
+from pboot import render_template
 
 frontend = Blueprint("frontend", __name__, template_folder="templates")
 

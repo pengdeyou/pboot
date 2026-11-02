@@ -1,17 +1,17 @@
 [project]
-name = "flaskr"
+name = "pbootr"
 version = "1.0.0"
-description = "The basic blog app built in the Flask tutorial."
+description = "The basic blog app built in the Pboot tutorial."
 readme = "README.rst"
 license = {file = "LICENSE.txt"}
 maintainers = [{name = "Pallets", email = "contact@palletsprojects.com"}]
 classifiers = ["Private :: Do Not Upload"]
 dependencies = [
-    "flask",
+    "pboot",
 ]
 
 [project.urls]
-Documentation = "https://flask.palletsprojects.com/tutorial/"
+Documentation = "https://gitee.com/pboot-org/pboot/tree/main/examples/tutorial"
 
 [project.optional-dependencies]
 test = ["pytest"]
@@ -21,7 +21,7 @@ requires = ["flit_core<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.flit.module]
-name = "flaskr"
+name = "pbootr"
 
 [tool.flit.sdist]
 include = [
@@ -34,7 +34,7 @@ filterwarnings = ["error"]
 
 [tool.coverage.run]
 branch = true
-source = ["flaskr", "tests"]
+source = ["pbootr", "tests"]
 
 [tool.ruff]
 src = ["src"]
@@ -42,4 +42,4 @@ src = ["src"]
 [tool.ruff.lint.isort]
 force-single-line = true
 order-by-type = false
-known-first-party = ["flaskr"]
+known-first-party = ["pbootr"]

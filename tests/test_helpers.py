@@ -4,8 +4,8 @@ import os
 import pytest
 import werkzeug.exceptions
 
-import flask
-from flask.helpers import get_debug_flag
+import pboot
+from pboot.helpers import get_debug_flag
 
 
 class FakePath:
@@ -35,7 +35,7 @@ class TestSendfile:
         with app.open_resource("static/index.html") as f:
             expect = f.read()
 
-        with flask.send_file("static/index.html") as rv:
+        with pboot.send_file("static/index.html") as rv:
             assert rv.direct_passthrough
             assert rv.mimetype == "text/html"
             rv.direct_passthrough = False
@@ -49,7 +49,7 @@ class TestSendfile:
             assert rv.cache_control.max_age is None
 
         # Test with direct use of send_file.
-        with flask.send_file("static/index.html") as rv:
+        with pboot.send_file("static/index.html") as rv:
             assert rv.cache_control.max_age is None
 
         app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 3600
@@ -59,14 +59,14 @@ class TestSendfile:
             assert rv.cache_control.max_age == 3600
 
         # Test with direct use of send_file.
-        with flask.send_file("static/index.html") as rv:
+        with pboot.send_file("static/index.html") as rv:
             assert rv.cache_control.max_age == 3600
 
         # Test with pathlib.Path.
         with app.send_static_file(FakePath("index.html")) as rv:
             assert rv.cache_control.max_age == 3600
 
-        class StaticFileApp(flask.Flask):
+        class StaticFileApp(pboot.Pboot):
             def get_send_file_max_age(self, filename):
                 return 10
 
@@ -78,7 +78,7 @@ class TestSendfile:
                 assert rv.cache_control.max_age == 10
 
             # Test with direct use of send_file.
-            with flask.send_file("static/index.html") as rv:
+            with pboot.send_file("static/index.html") as rv:
                 assert rv.cache_control.max_age == 10
 
     def test_send_from_directory(self, app, req_ctx):
@@ -86,7 +86,7 @@ class TestSendfile:
             os.path.dirname(__file__), "test_apps", "subdomaintestmodule"
         )
 
-        with flask.send_from_directory("static", "hello.txt") as rv:
+        with pboot.send_from_directory("static", "hello.txt") as rv:
             rv.direct_passthrough = False
             assert rv.data.strip() == b"Hello Subdomain"
 
@@ -97,7 +97,7 @@ class TestUrlFor:
         def index():
             return "42"
 
-        assert flask.url_for("index", _anchor="x y") == "/#x%20y"
+        assert pboot.url_for("index", _anchor="x y") == "/#x%20y"
 
     def test_url_for_with_scheme(self, app, req_ctx):
         @app.route("/")
@@ -105,7 +105,7 @@ class TestUrlFor:
             return "42"
 
         assert (
-            flask.url_for("index", _external=True, _scheme="https")
+            pboot.url_for("index", _external=True, _scheme="https")
             == "https://localhost/"
         )
 
@@ -113,27 +113,27 @@ class TestUrlFor:
         app.add_url_rule("/", endpoint="index")
 
         # Implicit external with scheme.
-        url = flask.url_for("index", _scheme="https")
+        url = pboot.url_for("index", _scheme="https")
         assert url == "https://localhost/"
 
         # Error when external=False with scheme
         with pytest.raises(ValueError):
-            flask.url_for("index", _scheme="https", _external=False)
+            pboot.url_for("index", _scheme="https", _external=False)
 
     def test_url_for_with_alternating_schemes(self, app, req_ctx):
         @app.route("/")
         def index():
             return "42"
 
-        assert flask.url_for("index", _external=True) == "http://localhost/"
+        assert pboot.url_for("index", _external=True) == "http://localhost/"
         assert (
-            flask.url_for("index", _external=True, _scheme="https")
+            pboot.url_for("index", _external=True, _scheme="https")
             == "https://localhost/"
         )
-        assert flask.url_for("index", _external=True) == "http://localhost/"
+        assert pboot.url_for("index", _external=True) == "http://localhost/"
 
     def test_url_with_method(self, app, req_ctx):
-        from flask.views import MethodView
+        from pboot.views import MethodView
 
         class MyView(MethodView):
             def get(self, id=None):
@@ -149,20 +149,20 @@ class TestUrlFor:
         app.add_url_rule("/myview/<int:id>", methods=["GET"], view_func=myview)
         app.add_url_rule("/myview/create", methods=["POST"], view_func=myview)
 
-        assert flask.url_for("myview", _method="GET") == "/myview/"
-        assert flask.url_for("myview", id=42, _method="GET") == "/myview/42"
-        assert flask.url_for("myview", _method="POST") == "/myview/create"
+        assert pboot.url_for("myview", _method="GET") == "/myview/"
+        assert pboot.url_for("myview", id=42, _method="GET") == "/myview/42"
+        assert pboot.url_for("myview", _method="POST") == "/myview/create"
 
     def test_url_for_with_self(self, app, req_ctx):
         @app.route("/<self>")
         def index(self):
             return "42"
 
-        assert flask.url_for("index", self="2") == "/2"
+        assert pboot.url_for("index", self="2") == "/2"
 
 
 def test_redirect_no_app():
-    response = flask.redirect("https://localhost", 307)
+    response = pboot.redirect("https://localhost", 307)
     assert response.location == "https://localhost"
     assert response.status_code == 307
 
@@ -174,25 +174,25 @@ def test_redirect_with_app(app):
     app.redirect = redirect
 
     with app.app_context(), pytest.raises(ValueError):
-        flask.redirect("other")
+        pboot.redirect("other")
 
 
 def test_abort_no_app():
     with pytest.raises(werkzeug.exceptions.Unauthorized):
-        flask.abort(401)
+        pboot.abort(401)
 
     with pytest.raises(LookupError):
-        flask.abort(900)
+        pboot.abort(900)
 
 
 def test_app_aborter_class():
     class MyAborter(werkzeug.exceptions.Aborter):
         pass
 
-    class MyFlask(flask.Flask):
+    class MyPboot(pboot.Pboot):
         aborter_class = MyAborter
 
-    app = MyFlask(__name__)
+    app = MyPboot(__name__)
     assert isinstance(app.aborter, MyAborter)
 
 
@@ -203,16 +203,16 @@ def test_abort_with_app(app):
     app.aborter.mapping[900] = My900Error
 
     with app.app_context(), pytest.raises(My900Error):
-        flask.abort(900)
+        pboot.abort(900)
 
 
 class TestNoImports:
-    """Test Flasks are created without import.
+    """Test Pboots are created without import.
 
-    Avoiding ``__import__`` helps create Flask instances where there are errors
+    Avoiding ``__import__`` helps create Pboot instances where there are errors
     at import time.  Those runtime errors will be apparent to the user soon
-    enough, but tools which build Flask instances meta-programmatically benefit
-    from a Flask which does not ``__import__``.  Instead of importing to
+    enough, but tools which build Pboot instances meta-programmatically benefit
+    from a Pboot which does not ``__import__``.  Instead of importing to
     retrieve file paths or metadata on a module or package, use the pkgutil and
     imp modules in the Python standard library.
     """
@@ -220,9 +220,9 @@ class TestNoImports:
     def test_name_with_import_error(self, modules_tmp_path):
         (modules_tmp_path / "importerror.py").write_text("raise NotImplementedError()")
         try:
-            flask.Flask("importerror")
+            pboot.Pboot("importerror")
         except NotImplementedError:
-            AssertionError("Flask(import_name) is importing import_name.")
+            AssertionError("Pboot(import_name) is importing import_name.")
 
 
 class TestStreaming:
@@ -231,10 +231,10 @@ class TestStreaming:
         def index():
             def generate():
                 yield "Hello "
-                yield flask.request.args["name"]
+                yield pboot.request.args["name"]
                 yield "!"
 
-            return flask.Response(flask.stream_with_context(generate()))
+            return pboot.Response(pboot.stream_with_context(generate()))
 
         rv = client.get("/?name=World")
         assert rv.data == b"Hello World!"
@@ -242,13 +242,13 @@ class TestStreaming:
     def test_streaming_with_context_as_decorator(self, app, client):
         @app.route("/")
         def index():
-            @flask.stream_with_context
+            @pboot.stream_with_context
             def generate(hello):
                 yield hello
-                yield flask.request.args["name"]
+                yield pboot.request.args["name"]
                 yield "!"
 
-            return flask.Response(generate("Hello "))
+            return pboot.Response(generate("Hello "))
 
         rv = client.get("/?name=World")
         assert rv.data == b"Hello World!"
@@ -275,10 +275,10 @@ class TestStreaming:
         def index():
             def generate():
                 yield "Hello "
-                yield flask.request.args["name"]
+                yield pboot.request.args["name"]
                 yield "!"
 
-            return flask.Response(flask.stream_with_context(Wrapper(generate())))
+            return pboot.Response(pboot.stream_with_context(Wrapper(generate())))
 
         rv = client.get("/?name=World")
         assert rv.data == b"Hello World!"
@@ -287,41 +287,41 @@ class TestStreaming:
     def test_stream_keeps_session(self, app, client):
         @app.route("/")
         def index():
-            flask.session["test"] = "flask"
+            pboot.session["test"] = "pboot"
 
-            @flask.stream_with_context
+            @pboot.stream_with_context
             def gen():
-                yield flask.session["test"]
+                yield pboot.session["test"]
 
-            return flask.Response(gen())
+            return pboot.Response(gen())
 
         rv = client.get("/")
-        assert rv.data == b"flask"
+        assert rv.data == b"pboot"
 
     def test_async_view(self, app, client):
         @app.route("/")
         async def index():
-            flask.session["test"] = "flask"
+            pboot.session["test"] = "pboot"
 
-            @flask.stream_with_context
+            @pboot.stream_with_context
             def gen():
-                yield flask.session["test"]
+                yield pboot.session["test"]
 
-            return flask.Response(gen())
+            return pboot.Response(gen())
 
         # response is closed without reading stream
         client.get().close()
 
         # response stream is read
         with client.get() as rv:
-            assert rv.text == "flask"
+            assert rv.text == "pboot"
 
         # same as above, but with client context preservation
         with client:
             client.get().close()
 
         with client, client.get() as rv:
-            assert rv.text == "flask"
+            assert rv.text == "pboot"
 
 
 class TestHelpers:
@@ -336,17 +336,17 @@ class TestHelpers:
         ],
     )
     def test_get_debug_flag(self, monkeypatch, debug, expect):
-        monkeypatch.setenv("FLASK_DEBUG", debug)
+        monkeypatch.setenv("PBOOT_DEBUG", debug)
         assert get_debug_flag() == expect
 
     def test_make_response(self):
-        app = flask.Flask(__name__)
+        app = pboot.Pboot(__name__)
         with app.test_request_context():
-            rv = flask.helpers.make_response()
+            rv = pboot.helpers.make_response()
             assert rv.status_code == 200
             assert rv.mimetype == "text/html"
 
-            rv = flask.helpers.make_response("Hello")
+            rv = pboot.helpers.make_response("Hello")
             assert rv.status_code == 200
             assert rv.data == b"Hello"
             assert rv.mimetype == "text/html"
@@ -354,7 +354,7 @@ class TestHelpers:
 
 @pytest.mark.parametrize("mode", ("r", "rb", "rt"))
 def test_open_resource(mode):
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
 
     with app.open_resource("static/index.html", mode) as f:
         assert "<h1>Hello World!</h1>" in str(f.read())
@@ -362,7 +362,7 @@ def test_open_resource(mode):
 
 @pytest.mark.parametrize("mode", ("w", "x", "a", "r+"))
 def test_open_resource_exceptions(mode):
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
 
     with pytest.raises(ValueError):
         app.open_resource("static/index.html", mode)
@@ -370,7 +370,7 @@ def test_open_resource_exceptions(mode):
 
 @pytest.mark.parametrize("encoding", ("utf-8", "utf-16-le"))
 def test_open_resource_with_encoding(tmp_path, encoding):
-    app = flask.Flask(__name__, root_path=os.fspath(tmp_path))
+    app = pboot.Pboot(__name__, root_path=os.fspath(tmp_path))
     (tmp_path / "test").write_text("test", encoding=encoding)
 
     with app.open_resource("test", mode="rt", encoding=encoding) as f:

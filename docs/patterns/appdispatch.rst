@@ -1,15 +1,15 @@
 Application Dispatching
 =======================
 
-Application dispatching is the process of combining multiple Flask
-applications on the WSGI level.  You can combine not only Flask
+Application dispatching is the process of combining multiple Pboot
+applications on the WSGI level.  You can combine not only Pboot
 applications but any WSGI application.  This would allow you to run a
-Django and a Flask application in the same interpreter side by side if
+Django and a Pboot application in the same interpreter side by side if
 you want.  The usefulness of this depends on how the applications work
 internally.
 
 The fundamental difference from :doc:`packages` is that in this case you
-are running the same or different Flask applications that are entirely
+are running the same or different Pboot applications that are entirely
 isolated from each other. They run different configurations and are
 dispatched on the WSGI level.
 
@@ -19,14 +19,14 @@ Working with this Document
 
 Each of the techniques and examples below results in an ``application``
 object that can be run with any WSGI server. For development, use the
-``flask run`` command to start a development server. For production, see
+``pboot run`` command to start a development server. For production, see
 :doc:`/deploying/index`.
 
 .. code-block:: python
 
-    from flask import Flask
+    from pboot import Pboot
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
 
     @app.route('/')
     def hello_world():
@@ -39,7 +39,7 @@ Combining Applications
 If you have entirely separated applications and you want them to work next
 to each other in the same Python interpreter process you can take
 advantage of the :class:`werkzeug.wsgi.DispatcherMiddleware`.  The idea
-here is that each Flask application is a valid WSGI application and they
+here is that each Pboot application is a valid WSGI application and they
 are combined by the dispatcher middleware into a larger one that is
 dispatched based on prefix.
 
@@ -76,7 +76,7 @@ the dynamic application creation.
 
 The perfect level for abstraction in that regard is the WSGI layer.  You
 write your own WSGI application that looks at the request that comes and
-delegates it to your Flask application.  If that application does not
+delegates it to your Pboot application.  If that application does not
 exist yet, it is dynamically created and remembered.
 
 .. code-block:: python

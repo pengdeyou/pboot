@@ -5,8 +5,8 @@ from uuid import uuid4
 import pytest
 from markupsafe import Markup
 
-from flask.json.tag import JSONTag
-from flask.json.tag import TaggedJSONSerializer
+from pboot.json.tag import JSONTag
+from pboot.json.tag import TaggedJSONSerializer
 
 
 @pytest.mark.parametrize(

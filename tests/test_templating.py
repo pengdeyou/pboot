@@ -5,7 +5,7 @@ import werkzeug.serving
 from jinja2 import TemplateNotFound
 from markupsafe import Markup
 
-import flask
+import pboot
 
 
 def test_context_processing(app, client):
@@ -15,7 +15,7 @@ def test_context_processing(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("context_template.html", value=23)
+        return pboot.render_template("context_template.html", value=23)
 
     rv = client.get("/")
     assert rv.data == b"<p>23|42"
@@ -24,7 +24,7 @@ def test_context_processing(app, client):
 def test_original_win(app, client):
     @app.route("/")
     def index():
-        return flask.render_template_string("{{ config }}", config=42)
+        return pboot.render_template_string("{{ config }}", config=42)
 
     rv = client.get("/")
     assert rv.data == b"42"
@@ -33,7 +33,7 @@ def test_original_win(app, client):
 def test_simple_stream(app, client):
     @app.route("/")
     def index():
-        return flask.stream_template_string("{{ config }}", config=42)
+        return pboot.stream_template_string("{{ config }}", config=42)
 
     rv = client.get("/")
     assert rv.data == b"42"
@@ -46,16 +46,16 @@ def test_request_less_rendering(app, app_ctx):
     def context_processor():
         return dict(foo=42)
 
-    rv = flask.render_template_string("Hello {{ config.WORLD_NAME }} {{ foo }}")
+    rv = pboot.render_template_string("Hello {{ config.WORLD_NAME }} {{ foo }}")
     assert rv == "Hello Special World 42"
 
 
 def test_standard_context(app, client):
     @app.route("/")
     def index():
-        flask.g.foo = 23
-        flask.session["test"] = "aha"
-        return flask.render_template_string(
+        pboot.g.foo = 23
+        pboot.session["test"] = "aha"
+        return pboot.render_template_string(
             """
             {{ request.args.foo }}
             {{ g.foo }}
@@ -73,7 +73,7 @@ def test_escaping(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template(
+        return pboot.render_template(
             "escaping_template.html", text=text, html=Markup(text)
         )
 
@@ -93,7 +93,7 @@ def test_no_escaping(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template(
+        return pboot.render_template(
             "non_escaping_template.txt", text=text, html=Markup(text)
         )
 
@@ -111,12 +111,12 @@ def test_no_escaping(app, client):
 
 
 def test_escaping_without_template_filename(app, client, req_ctx):
-    assert flask.render_template_string("{{ foo }}", foo="<test>") == "&lt;test&gt;"
-    assert flask.render_template("mail.txt", foo="<test>") == "<test> Mail"
+    assert pboot.render_template_string("{{ foo }}", foo="<test>") == "&lt;test&gt;"
+    assert pboot.render_template("mail.txt", foo="<test>") == "<test> Mail"
 
 
 def test_macros(app, req_ctx):
-    macro = flask.get_template_attribute("_macro.html", "hello")
+    macro = pboot.get_template_attribute("_macro.html", "hello")
     assert macro("World") == "Hello World!"
 
 
@@ -191,7 +191,7 @@ def test_template_filter_with_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_filter.html", value="abcd")
+        return pboot.render_template("template_filter.html", value="abcd")
 
     rv = client.get("/")
     assert rv.data == b"dcba"
@@ -205,7 +205,7 @@ def test_add_template_filter_with_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_filter.html", value="abcd")
+        return pboot.render_template("template_filter.html", value="abcd")
 
     rv = client.get("/")
     assert rv.data == b"dcba"
@@ -218,7 +218,7 @@ def test_template_filter_with_name_and_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_filter.html", value="abcd")
+        return pboot.render_template("template_filter.html", value="abcd")
 
     rv = client.get("/")
     assert rv.data == b"dcba"
@@ -232,7 +232,7 @@ def test_add_template_filter_with_name_and_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_filter.html", value="abcd")
+        return pboot.render_template("template_filter.html", value="abcd")
 
     rv = client.get("/")
     assert rv.data == b"dcba"
@@ -309,7 +309,7 @@ def test_template_test_with_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_test.html", value=False)
+        return pboot.render_template("template_test.html", value=False)
 
     rv = client.get("/")
     assert b"Success!" in rv.data
@@ -323,7 +323,7 @@ def test_add_template_test_with_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_test.html", value=False)
+        return pboot.render_template("template_test.html", value=False)
 
     rv = client.get("/")
     assert b"Success!" in rv.data
@@ -336,7 +336,7 @@ def test_template_test_with_name_and_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_test.html", value=False)
+        return pboot.render_template("template_test.html", value=False)
 
     rv = client.get("/")
     assert b"Success!" in rv.data
@@ -350,7 +350,7 @@ def test_add_template_test_with_name_and_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_test.html", value=False)
+        return pboot.render_template("template_test.html", value=False)
 
     rv = client.get("/")
     assert b"Success!" in rv.data
@@ -365,7 +365,7 @@ def test_add_template_global(app, app_ctx):
     assert app.jinja_env.globals["get_stuff"] == get_stuff
     assert app.jinja_env.globals["get_stuff"](), 42
 
-    rv = flask.render_template_string("{{ get_stuff() }}")
+    rv = pboot.render_template_string("{{ get_stuff() }}")
     assert rv == "42"
 
     @app.template_global
@@ -376,7 +376,7 @@ def test_add_template_global(app, app_ctx):
     assert app.jinja_env.globals["get_stuff_1"] == get_stuff_1
     assert app.jinja_env.globals["get_stuff_1"](), "get_stuff_1"
 
-    rv = flask.render_template_string("{{ get_stuff_1() }}")
+    rv = pboot.render_template_string("{{ get_stuff_1() }}")
     assert rv == "get_stuff_1"
 
     @app.template_global("my_get_stuff_custom_name_2")
@@ -387,7 +387,7 @@ def test_add_template_global(app, app_ctx):
     assert app.jinja_env.globals["my_get_stuff_custom_name_2"] == get_stuff_2
     assert app.jinja_env.globals["my_get_stuff_custom_name_2"](), "get_stuff_2"
 
-    rv = flask.render_template_string("{{ my_get_stuff_custom_name_2() }}")
+    rv = pboot.render_template_string("{{ my_get_stuff_custom_name_2() }}")
     assert rv == "get_stuff_2"
 
     @app.template_global(name="my_get_stuff_custom_name_3")
@@ -398,22 +398,22 @@ def test_add_template_global(app, app_ctx):
     assert app.jinja_env.globals["my_get_stuff_custom_name_3"] == get_stuff_3
     assert app.jinja_env.globals["my_get_stuff_custom_name_3"](), "get_stuff_3"
 
-    rv = flask.render_template_string("{{ my_get_stuff_custom_name_3() }}")
+    rv = pboot.render_template_string("{{ my_get_stuff_custom_name_3() }}")
     assert rv == "get_stuff_3"
 
 
 def test_custom_template_loader(client):
-    class MyFlask(flask.Flask):
+    class MyPboot(pboot.Pboot):
         def create_global_jinja_loader(self):
             from jinja2 import DictLoader
 
             return DictLoader({"index.html": "Hello Custom World!"})
 
-    app = MyFlask(__name__)
+    app = MyPboot(__name__)
 
     @app.route("/")
     def index():
-        return flask.render_template("index.html")
+        return pboot.render_template("index.html")
 
     c = app.test_client()
     rv = c.get("/")
@@ -427,7 +427,7 @@ def test_iterable_loader(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template(
+        return pboot.render_template(
             [
                 "no_template.xml",  # should skip this one
                 "simple_template.html",  # should render this
@@ -446,27 +446,27 @@ def test_templates_auto_reload(app):
     assert app.config["TEMPLATES_AUTO_RELOAD"] is None
     assert app.jinja_env.auto_reload is False
     # debug is False, config option is False
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config["TEMPLATES_AUTO_RELOAD"] = False
     assert app.debug is False
     assert app.jinja_env.auto_reload is False
     # debug is False, config option is True
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     assert app.debug is False
     assert app.jinja_env.auto_reload is True
     # debug is True, config option is None
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config["DEBUG"] = True
     assert app.config["TEMPLATES_AUTO_RELOAD"] is None
     assert app.jinja_env.auto_reload is True
     # debug is True, config option is False
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config["DEBUG"] = True
     app.config["TEMPLATES_AUTO_RELOAD"] = False
     assert app.jinja_env.auto_reload is False
     # debug is True, config option is True
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config["DEBUG"] = True
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     assert app.jinja_env.auto_reload is True
@@ -505,7 +505,7 @@ def test_template_loader_debugging(test_apps, monkeypatch):
             assert (
                 "looked up from an endpoint that belongs to the blueprint 'frontend'"
             ) in text
-            assert "See https://flask.palletsprojects.com/blueprints/#templates" in text
+            assert "See https://gitee.com/pboot-org/pboot/blob/main/docs/blueprints.rst" in text
 
     with app.test_client() as c:
         monkeypatch.setitem(app.config, "EXPLAIN_TEMPLATE_LOADING", True)
@@ -522,11 +522,11 @@ def test_template_loader_debugging(test_apps, monkeypatch):
 
 
 def test_custom_jinja_env():
-    class CustomEnvironment(flask.templating.Environment):
+    class CustomEnvironment(pboot.templating.Environment):
         pass
 
-    class CustomFlask(flask.Flask):
+    class CustomPboot(pboot.Pboot):
         jinja_environment = CustomEnvironment
 
-    app = CustomFlask(__name__)
+    app = CustomPboot(__name__)
     assert isinstance(app.jinja_env, CustomEnvironment)

@@ -1,8 +1,8 @@
 import pytest
-from flask import g
-from flask import session
+from pboot import g
+from pboot import session
 
-from flaskr.db import get_db
+from pbootr.db import get_db
 
 
 def test_register(client, app):

@@ -4,7 +4,7 @@ import tomllib
 
 import pytest
 
-import flask
+import pboot
 
 # config keys used for the TestConfig
 TEST_KEY = "foo"
@@ -18,26 +18,26 @@ def common_object_test(app):
 
 
 def test_config_from_pyfile():
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config.from_pyfile(f"{__file__.rsplit('.', 1)[0]}.py")
     common_object_test(app)
 
 
 def test_config_from_object():
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config.from_object(__name__)
     common_object_test(app)
 
 
 def test_config_from_file_json():
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     app.config.from_file(os.path.join(current_dir, "static", "config.json"), json.load)
     common_object_test(app)
 
 
 def test_config_from_file_toml():
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     app.config.from_file(
         os.path.join(current_dir, "static", "config.toml"), tomllib.load, text=False
@@ -46,15 +46,15 @@ def test_config_from_file_toml():
 
 
 def test_from_prefixed_env(monkeypatch):
-    monkeypatch.setenv("FLASK_STRING", "value")
-    monkeypatch.setenv("FLASK_BOOL", "true")
-    monkeypatch.setenv("FLASK_INT", "1")
-    monkeypatch.setenv("FLASK_FLOAT", "1.2")
-    monkeypatch.setenv("FLASK_LIST", "[1, 2]")
-    monkeypatch.setenv("FLASK_DICT", '{"k": "v"}')
-    monkeypatch.setenv("NOT_FLASK_OTHER", "other")
+    monkeypatch.setenv("PBOOT_STRING", "value")
+    monkeypatch.setenv("PBOOT_BOOL", "true")
+    monkeypatch.setenv("PBOOT_INT", "1")
+    monkeypatch.setenv("PBOOT_FLOAT", "1.2")
+    monkeypatch.setenv("PBOOT_LIST", "[1, 2]")
+    monkeypatch.setenv("PBOOT_DICT", '{"k": "v"}')
+    monkeypatch.setenv("NOT_PBOOT_OTHER", "other")
 
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config.from_prefixed_env()
 
     assert app.config["STRING"] == "value"
@@ -67,22 +67,22 @@ def test_from_prefixed_env(monkeypatch):
 
 
 def test_from_prefixed_env_custom_prefix(monkeypatch):
-    monkeypatch.setenv("FLASK_A", "a")
-    monkeypatch.setenv("NOT_FLASK_A", "b")
+    monkeypatch.setenv("PBOOT_A", "a")
+    monkeypatch.setenv("NOT_PBOOT_A", "b")
 
-    app = flask.Flask(__name__)
-    app.config.from_prefixed_env("NOT_FLASK")
+    app = pboot.Pboot(__name__)
+    app.config.from_prefixed_env("NOT_PBOOT")
 
     assert app.config["A"] == "b"
 
 
 def test_from_prefixed_env_nested(monkeypatch):
-    monkeypatch.setenv("FLASK_EXIST__ok", "other")
-    monkeypatch.setenv("FLASK_EXIST__inner__ik", "2")
-    monkeypatch.setenv("FLASK_EXIST__new__more", '{"k": false}')
-    monkeypatch.setenv("FLASK_NEW__K", "v")
+    monkeypatch.setenv("PBOOT_EXIST__ok", "other")
+    monkeypatch.setenv("PBOOT_EXIST__inner__ik", "2")
+    monkeypatch.setenv("PBOOT_EXIST__new__more", '{"k": false}')
+    monkeypatch.setenv("PBOOT_NEW__K", "v")
 
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config["EXIST"] = {"ok": "value", "flag": True, "inner": {"ik": 1}}
     app.config.from_prefixed_env()
 
@@ -108,23 +108,23 @@ def test_from_prefixed_env_nested(monkeypatch):
 
 
 def test_config_from_mapping():
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config.from_mapping({"SECRET_KEY": "config", "TEST_KEY": "foo"})
     common_object_test(app)
 
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config.from_mapping([("SECRET_KEY", "config"), ("TEST_KEY", "foo")])
     common_object_test(app)
 
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config.from_mapping(SECRET_KEY="config", TEST_KEY="foo")
     common_object_test(app)
 
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config.from_mapping(SECRET_KEY="config", TEST_KEY="foo", skip_key="skip")
     common_object_test(app)
 
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     with pytest.raises(TypeError):
         app.config.from_mapping({}, {})
 
@@ -136,14 +136,14 @@ def test_config_from_class():
     class Test(Base):
         SECRET_KEY = "config"
 
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config.from_object(Test)
     common_object_test(app)
 
 
 def test_config_from_envvar(monkeypatch):
     monkeypatch.setattr("os.environ", {})
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
 
     with pytest.raises(RuntimeError) as e:
         app.config.from_envvar("FOO_SETTINGS")
@@ -160,7 +160,7 @@ def test_config_from_envvar(monkeypatch):
 
 def test_config_from_envvar_missing(monkeypatch):
     monkeypatch.setattr("os.environ", {"FOO_SETTINGS": "missing.cfg"})
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     with pytest.raises(IOError) as e:
         app.config.from_envvar("FOO_SETTINGS")
     msg = str(e.value)
@@ -172,7 +172,7 @@ def test_config_from_envvar_missing(monkeypatch):
 
 
 def test_config_missing():
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     with pytest.raises(IOError) as e:
         app.config.from_pyfile("missing.cfg")
     msg = str(e.value)
@@ -184,7 +184,7 @@ def test_config_missing():
 
 
 def test_config_missing_file():
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     with pytest.raises(IOError) as e:
         app.config.from_file("missing.json", load=json.load)
     msg = str(e.value)
@@ -196,26 +196,26 @@ def test_config_missing_file():
 
 
 def test_custom_config_class():
-    class Config(flask.Config):
+    class Config(pboot.Config):
         pass
 
-    class Flask(flask.Flask):
+    class Pboot(pboot.Pboot):
         config_class = Config
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     assert isinstance(app.config, Config)
     app.config.from_object(__name__)
     common_object_test(app)
 
 
 def test_session_lifetime():
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config["PERMANENT_SESSION_LIFETIME"] = 42
     assert app.permanent_session_lifetime.seconds == 42
 
 
 def test_get_namespace():
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config["FOO_OPTION_1"] = "foo option 1"
     app.config["FOO_OPTION_2"] = "foo option 2"
     app.config["BAR_STUFF_1"] = "bar stuff 1"
@@ -244,7 +244,7 @@ def test_get_namespace():
 def test_from_pyfile_weird_encoding(tmp_path, encoding):
     f = tmp_path / "my_config.py"
     f.write_text(f'# -*- coding: {encoding} -*-\nTEST_VALUE = "föö"\n', encoding)
-    app = flask.Flask(__name__)
+    app = pboot.Pboot(__name__)
     app.config.from_pyfile(os.fspath(f))
     value = app.config["TEST_VALUE"]
     assert value == "föö"

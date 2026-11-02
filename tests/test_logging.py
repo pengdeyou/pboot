@@ -4,9 +4,9 @@ from io import StringIO
 
 import pytest
 
-from flask.logging import default_handler
-from flask.logging import has_level_handler
-from flask.logging import wsgi_errors_stream
+from pboot.logging import default_handler
+from pboot.logging import has_level_handler
+from pboot.logging import wsgi_errors_stream
 
 
 @pytest.fixture(autouse=True)
@@ -15,7 +15,7 @@ def reset_logging(pytestconfig):
     logging.root.handlers = []
     root_level = logging.root.level
 
-    logger = logging.getLogger("flask_test")
+    logger = logging.getLogger("pboot_test")
     logger.handlers = []
     logger.setLevel(logging.NOTSET)
 
@@ -34,7 +34,7 @@ def reset_logging(pytestconfig):
 
 
 def test_logger(app):
-    assert app.logger.name == "flask_test"
+    assert app.logger.name == "pboot_test"
     assert app.logger.level == logging.NOTSET
     assert app.logger.handlers == [default_handler]
 
@@ -68,7 +68,7 @@ def test_wsgi_errors_stream(app, client):
 
 
 def test_has_level_handler():
-    logger = logging.getLogger("flask.app")
+    logger = logging.getLogger("pboot.app")
     assert not has_level_handler(logger)
 
     handler = logging.StreamHandler()

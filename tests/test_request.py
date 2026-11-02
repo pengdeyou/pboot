@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from flask import Flask
-from flask import Request
-from flask import request
-from flask.testing import FlaskClient
+from pboot import Pboot
+from pboot import Request
+from pboot import request
+from pboot.testing import PbootClient
 
 
-def test_max_content_length(app: Flask, client: FlaskClient) -> None:
+def test_max_content_length(app: Pboot, client: PbootClient) -> None:
     app.config["MAX_CONTENT_LENGTH"] = 50
 
     @app.post("/")
@@ -22,7 +22,7 @@ def test_max_content_length(app: Flask, client: FlaskClient) -> None:
     assert rv.data == b"42"
 
 
-def test_limit_config(app: Flask):
+def test_limit_config(app: Pboot):
     app.config["MAX_CONTENT_LENGTH"] = 100
     app.config["MAX_FORM_MEMORY_SIZE"] = 50
     app.config["MAX_FORM_PARTS"] = 3
@@ -54,7 +54,7 @@ def test_limit_config(app: Flask):
         assert r.max_form_parts == 4
 
 
-def test_trusted_hosts_config(app: Flask) -> None:
+def test_trusted_hosts_config(app: Pboot) -> None:
     app.config["TRUSTED_HOSTS"] = ["example.test", ".other.test"]
 
     @app.get("/")

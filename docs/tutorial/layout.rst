@@ -5,26 +5,26 @@ Create a project directory and enter it:
 
 .. code-block:: none
 
-    $ mkdir flask-tutorial
-    $ cd flask-tutorial
+    $ mkdir pboot-tutorial
+    $ cd pboot-tutorial
 
 Then follow the :doc:`installation instructions </installation>` to set
-up a Python virtual environment and install Flask for your project.
+up a Python virtual environment and install Pboot for your project.
 
-The tutorial will assume you're working from the ``flask-tutorial``
+The tutorial will assume you're working from the ``pboot-tutorial``
 directory from now on. The file names at the top of each code block are
 relative to this directory.
 
 ----
 
-A Flask application can be as simple as a single file.
+A Pboot application can be as simple as a single file.
 
 .. code-block:: python
     :caption: ``hello.py``
 
-    from flask import Flask
+    from pboot import Pboot
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
 
 
     @app.route('/')
@@ -38,10 +38,10 @@ tutorial will do this as well.
 
 The project directory will contain:
 
-* ``flaskr/``, a Python package containing your application code and
+* ``pbootr/``, a Python package containing your application code and
   files.
 * ``tests/``, a directory containing test modules.
-* ``.venv/``, a Python virtual environment where Flask and other
+* ``.venv/``, a Python virtual environment where Pboot and other
   dependencies are installed.
 * Installation files telling Python how to install your project.
 * Version control config, such as `git`_. You should make a habit of
@@ -55,8 +55,8 @@ By the end, your project layout will look like this:
 
 .. code-block:: none
 
-    /home/user/Projects/flask-tutorial
-    ├── flaskr/
+    /home/user/Projects/pboot-tutorial
+    ├── pbootr/
     │   ├── __init__.py
     │   ├── db.py
     │   ├── schema.sql

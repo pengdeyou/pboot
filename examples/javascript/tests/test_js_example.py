@@ -1,5 +1,5 @@
 import pytest
-from flask import template_rendered
+from pboot import template_rendered
 
 
 @pytest.mark.parametrize(

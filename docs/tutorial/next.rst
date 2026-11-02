@@ -1,22 +1,22 @@
 Keep Developing!
 ================
 
-You've learned about quite a few Flask and Python concepts throughout
+You've learned about quite a few Pboot and Python concepts throughout
 the tutorial. Go back and review the tutorial and compare your code with
 the steps you took to get there. Compare your project to the
 :gh:`example project <examples/tutorial>`, which might look a bit
 different due to the step-by-step nature of the tutorial.
 
-There's a lot more to Flask than what you've seen so far. Even so,
+There's a lot more to Pboot than what you've seen so far. Even so,
 you're now equipped to start developing your own web applications. Check
-out the :doc:`/quickstart` for an overview of what Flask can do, then
-dive into the docs to keep learning. Flask uses `Jinja`_, `Click`_,
+out the :doc:`/quickstart` for an overview of what Pboot can do, then
+dive into the docs to keep learning. Pboot uses `Jinja`_, `Click`_,
 `Werkzeug`_, and `ItsDangerous`_ behind the scenes, and they all have
 their own documentation too. You'll also be interested in
 :doc:`/extensions` which make tasks like working with the database or
 validating form data easier and more powerful.
 
-If you want to keep developing your Flaskr project, here are some ideas
+If you want to keep developing your Pbootr project, here are some ideas
 for what to try next:
 
 *   A detail view to show a single post. Click a post's title to go to

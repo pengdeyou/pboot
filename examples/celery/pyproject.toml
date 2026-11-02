@@ -1,10 +1,10 @@
 [project]
-name = "flask-example-celery"
+name = "pboot-example-celery"
 version = "1.0.0"
-description = "Example Flask application with Celery background tasks."
+description = "Example Pboot application with Celery background tasks."
 readme = "README.md"
 classifiers = ["Private :: Do Not Upload"]
-dependencies = ["flask", "celery[redis]"]
+dependencies = ["pboot", "celery[redis]"]
 
 [build-system]
 requires = ["flit_core<4"]

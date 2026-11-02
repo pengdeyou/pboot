@@ -1,22 +1,22 @@
 Modular Applications with Blueprints
 ====================================
 
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
 .. versionadded:: 0.7
 
-Flask uses a concept of *blueprints* for making application components and
+Pboot uses a concept of *blueprints* for making application components and
 supporting common patterns within an application or across applications.
 Blueprints can greatly simplify how large applications work and provide a
-central means for Flask extensions to register operations on applications.
-A :class:`Blueprint` object works similarly to a :class:`Flask`
+central means for Pboot extensions to register operations on applications.
+A :class:`Blueprint` object works similarly to a :class:`Pboot`
 application object, but it is not actually an application.  Rather it is a
 *blueprint* of how to construct or extend an application.
 
 Why Blueprints?
 ---------------
 
-Blueprints in Flask are intended for these cases:
+Blueprints in Pboot are intended for these cases:
 
 * Factor an application into a set of blueprints.  This is ideal for
   larger applications; a project could instantiate an application object,
@@ -30,16 +30,16 @@ Blueprints in Flask are intended for these cases:
   through blueprints.  A blueprint does not have to implement applications
   or view functions.
 * Register a blueprint on an application for any of these cases when
-  initializing a Flask extension.
+  initializing a Pboot extension.
 
-A blueprint in Flask is not a pluggable app because it is not actually an
+A blueprint in Pboot is not a pluggable app because it is not actually an
 application -- it's a set of operations which can be registered on an
 application, even multiple times.  Why not have multiple application
 objects?  You can do that (see :doc:`/patterns/appdispatch`), but your
 applications will have separate configs and will be managed at the WSGI
 layer.
 
-Blueprints instead provide separation at the Flask level, share
+Blueprints instead provide separation at the Pboot level, share
 application config, and can change an application object as necessary with
 being registered. The downside is that you cannot unregister a blueprint
 once an application was created without having to destroy the whole
@@ -49,7 +49,7 @@ The Concept of Blueprints
 -------------------------
 
 The basic concept of blueprints is that they record operations to execute
-when registered on an application.  Flask associates view functions with
+when registered on an application.  Pboot associates view functions with
 blueprints when dispatching requests and generating URLs from one endpoint
 to another.
 
@@ -59,7 +59,7 @@ My First Blueprint
 This is what a very basic blueprint looks like.  In this case we want to
 implement a blueprint that does simple rendering of static templates::
 
-    from flask import Blueprint, render_template, abort
+    from pboot import Blueprint, render_template, abort
     from jinja2 import TemplateNotFound
 
     simple_page = Blueprint('simple_page', __name__,
@@ -86,10 +86,10 @@ Registering Blueprints
 
 So how do you register that blueprint?  Like this::
 
-    from flask import Flask
+    from pboot import Pboot
     from yourapplication.simple_page import simple_page
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.register_blueprint(simple_page)
 
 If you check the rules registered on the application, you will find
@@ -259,7 +259,7 @@ blueprint, the best idea is to lay out your templates like this::
 And then when you want to render the template, use :file:`admin/index.html` as
 the name to look up the template by.  If you encounter problems loading
 the correct templates enable the ``EXPLAIN_TEMPLATE_LOADING`` config
-variable which will instruct Flask to print out the steps it goes through
+variable which will instruct Pboot to print out the steps it goes through
 to locate templates on every ``render_template`` call.
 
 Building URLs
@@ -284,7 +284,7 @@ was dispatched to any other admin blueprint endpoint.
 Blueprint Error Handlers
 ------------------------
 
-Blueprints support the ``errorhandler`` decorator just like the :class:`Flask`
+Blueprints support the ``errorhandler`` decorator just like the :class:`Pboot`
 application object, so it is easy to make Blueprint-specific custom error
 pages.
 

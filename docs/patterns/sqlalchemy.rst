@@ -1,8 +1,8 @@
-SQLAlchemy in Flask
+SQLAlchemy in Pboot
 ===================
 
 Many people prefer `SQLAlchemy`_ for database access.  In this case it's
-encouraged to use a package instead of a module for your flask application
+encouraged to use a package instead of a module for your pboot application
 and drop the models into a separate module (:doc:`packages`). While that
 is not necessary, it makes a lot of sense.
 
@@ -14,7 +14,7 @@ Flask-SQLAlchemy Extension
 
 Because SQLAlchemy is a common database abstraction layer and object
 relational mapper that requires a little bit of configuration effort,
-there is a Flask extension that handles that for you.  This is recommended
+there is a Pboot extension that handles that for you.  This is recommended
 if you want to get started quickly.
 
 You can download `Flask-SQLAlchemy`_ from `PyPI
@@ -53,11 +53,11 @@ Here's the example :file:`database.py` module for your application::
 To define your models, just subclass the `Base` class that was created by
 the code above.  If you are wondering why we don't have to care about
 threads here (like we did in the SQLite3 example above with the
-:data:`~flask.g` object): that's because SQLAlchemy does that for us
+:data:`~pboot.g` object): that's because SQLAlchemy does that for us
 already with the :class:`~sqlalchemy.orm.scoped_session`.
 
 To use SQLAlchemy in a declarative way with your application, you just
-have to put the following code into your application module.  Flask will
+have to put the following code into your application module.  Pboot will
 automatically remove database sessions at the end of the request or
 when the application shuts down::
 

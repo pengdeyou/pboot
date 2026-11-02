@@ -6,7 +6,7 @@ uploads is actually quite simple.  It basically works like this:
 
 1. A ``<form>`` tag is marked with ``enctype=multipart/form-data``
    and an ``<input type=file>`` is placed in that form.
-2. The application accesses the file from the :attr:`~flask.request.files`
+2. The application accesses the file from the :attr:`~pboot.request.files`
    dictionary on the request object.
 3. use the :meth:`~werkzeug.datastructures.FileStorage.save` method of the file to save
    the file permanently somewhere on the filesystem.
@@ -19,13 +19,13 @@ specific upload folder and displays a file to the user.  Let's look at the
 bootstrapping code for our application::
 
     import os
-    from flask import Flask, flash, request, redirect, url_for
+    from pboot import Pboot, flash, request, redirect, url_for
     from werkzeug.utils import secure_filename
 
     UPLOAD_FOLDER = '/path/to/the/uploads'
     ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 So first we need a couple of imports.  Most should be straightforward, the
@@ -108,7 +108,7 @@ download URLs.
 
 .. code-block:: python
 
-    from flask import send_from_directory
+    from pboot import send_from_directory
 
     @app.route('/uploads/<name>')
     def download_file(name):
@@ -130,21 +130,21 @@ Improving Uploads
 
 .. versionadded:: 0.6
 
-So how exactly does Flask handle uploads?  Well it will store them in the
+So how exactly does Pboot handle uploads?  Well it will store them in the
 webserver's memory if the files are reasonably small, otherwise in a
 temporary location (as returned by :func:`tempfile.gettempdir`).  But how
 do you specify the maximum file size after which an upload is aborted?  By
-default Flask will happily accept file uploads with an unlimited amount of
+default Pboot will happily accept file uploads with an unlimited amount of
 memory, but you can limit that by setting the ``MAX_CONTENT_LENGTH``
 config key::
 
-    from flask import Flask, Request
+    from pboot import Pboot, Request
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
 The code above will limit the maximum allowed payload to 16 megabytes.
-If a larger file is transmitted, Flask will raise a
+If a larger file is transmitted, Pboot will raise a
 :exc:`~werkzeug.exceptions.RequestEntityTooLarge` exception.
 
 .. admonition:: Connection Reset Issue
@@ -153,7 +153,7 @@ If a larger file is transmitted, Flask will raise a
     reset error instead of a 413 response. You will get the correct
     status response when running the app with a production WSGI server.
 
-This feature was added in Flask 0.6 but can be achieved in older versions
+This feature was added in Pboot 0.6 but can be achieved in older versions
 as well by subclassing the request object.  For more information on that
 consult the Werkzeug documentation on file handling.
 
@@ -175,7 +175,7 @@ are JavaScript libraries like jQuery_ that have form plugins to ease the
 construction of progress bar.
 
 Because the common pattern for file uploads exists almost unchanged in all
-applications dealing with uploads, there are also some Flask extensions that
+applications dealing with uploads, there are also some Pboot extensions that
 implement a full fledged upload mechanism that allows controlling which
 file extensions are allowed to be uploaded.
 

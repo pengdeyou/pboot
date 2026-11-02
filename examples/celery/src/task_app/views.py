@@ -1,6 +1,6 @@
 from celery.result import AsyncResult
-from flask import Blueprint
-from flask import request
+from pboot import Blueprint
+from pboot import request
 
 from . import tasks
 

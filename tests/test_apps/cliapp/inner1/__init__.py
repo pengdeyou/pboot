@@ -1,3 +1,3 @@
-from flask import Flask
+from pboot import Pboot
 
-application = Flask(__name__)
+application = Pboot(__name__)

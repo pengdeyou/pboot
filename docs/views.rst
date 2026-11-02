@@ -1,7 +1,7 @@
 Class-based Views
 =================
 
-.. currentmodule:: flask.views
+.. currentmodule:: pboot.views
 
 This page introduces using the :class:`View` and :class:`MethodView`
 classes to write class-based views.
@@ -15,7 +15,7 @@ An example of where this is useful is defining a class that creates an
 API based on the database model it is initialized with.
 
 For more complex API behavior and customization, look into the various
-API extensions for Flask.
+API extensions for Pboot.
 
 
 Basic Reusable View
@@ -43,7 +43,7 @@ class without any customization.
 
 .. code-block:: python
 
-    from flask.views import View
+    from pboot.views import View
 
     class UserList(View):
         def dispatch_request(self):
@@ -55,9 +55,9 @@ class without any customization.
 The :meth:`View.dispatch_request` method is the equivalent of the view
 function. Calling :meth:`View.as_view` method will create a view
 function that can be registered on the app with its
-:meth:`~flask.Flask.add_url_rule` method. The first argument to
+:meth:`~pboot.Pboot.add_url_rule` method. The first argument to
 ``as_view`` is the name to use to refer to the view with
-:func:`~flask.url_for`.
+:func:`~pboot.url_for`.
 
 .. note::
 
@@ -135,7 +135,7 @@ doing it for every request is unnecessary and can be inefficient. To
 avoid this, set :attr:`View.init_every_request` to ``False``, which will
 only create one instance of the class and use it for every request. In
 this case, writing to ``self`` is not safe. If you need to store data
-during the request, use :data:`~flask.g` instead.
+during the request, use :data:`~pboot.g` instead.
 
 In the ``ListView`` example, nothing writes to ``self`` during the
 request, so it is more efficient to create a single instance.
@@ -243,7 +243,7 @@ provide get (list) and post (create) methods.
 
 .. code-block:: python
 
-    from flask.views import MethodView
+    from pboot.views import MethodView
 
     class ItemAPI(MethodView):
         init_every_request = False

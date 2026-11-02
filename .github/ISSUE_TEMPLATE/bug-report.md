@@ -1,10 +1,10 @@
 ---
 name: Bug report
-about: Report a bug in Flask (not other projects which depend on Flask)
+about: Report a bug in Pboot (not other projects which depend on Pboot)
 ---
 
 <!--
-This issue tracker is a tool to address bugs in Flask itself. Please use
+This issue tracker is a tool to address bugs in Pboot itself. Please use
 GitHub Discussions or the Pallets Discord for questions about your own code.
 
 Replace this comment with a clear outline of what the bug is.
@@ -24,4 +24,4 @@ Describe the expected behavior that should have happened but didn't.
 Environment:
 
 - Python version:
-- Flask version:
+- Pboot version:

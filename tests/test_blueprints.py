@@ -1,13 +1,13 @@
 import pytest
 from jinja2 import TemplateNotFound
 
-import flask
+import pboot
 
 
 def test_blueprint_specific_error_handling(app, client):
-    frontend = flask.Blueprint("frontend", __name__)
-    backend = flask.Blueprint("backend", __name__)
-    sideend = flask.Blueprint("sideend", __name__)
+    frontend = pboot.Blueprint("frontend", __name__)
+    backend = pboot.Blueprint("backend", __name__)
+    sideend = pboot.Blueprint("sideend", __name__)
 
     @frontend.errorhandler(403)
     def frontend_forbidden(e):
@@ -15,7 +15,7 @@ def test_blueprint_specific_error_handling(app, client):
 
     @frontend.route("/frontend-no")
     def frontend_no():
-        flask.abort(403)
+        pboot.abort(403)
 
     @backend.errorhandler(403)
     def backend_forbidden(e):
@@ -23,11 +23,11 @@ def test_blueprint_specific_error_handling(app, client):
 
     @backend.route("/backend-no")
     def backend_no():
-        flask.abort(403)
+        pboot.abort(403)
 
     @sideend.route("/what-is-a-sideend")
     def sideend_no():
-        flask.abort(403)
+        pboot.abort(403)
 
     app.register_blueprint(frontend)
     app.register_blueprint(backend)
@@ -49,7 +49,7 @@ def test_blueprint_specific_user_error_handling(app, client):
     class MyFunctionException(Exception):
         pass
 
-    blue = flask.Blueprint("blue", __name__)
+    blue = pboot.Blueprint("blue", __name__)
 
     @blue.errorhandler(MyDecoratorException)
     def my_decorator_exception_handler(e):
@@ -77,7 +77,7 @@ def test_blueprint_specific_user_error_handling(app, client):
 
 
 def test_blueprint_app_error_handling(app, client):
-    errors = flask.Blueprint("errors", __name__)
+    errors = pboot.Blueprint("errors", __name__)
 
     @errors.app_errorhandler(403)
     def forbidden_handler(e):
@@ -85,13 +85,13 @@ def test_blueprint_app_error_handling(app, client):
 
     @app.route("/forbidden")
     def app_forbidden():
-        flask.abort(403)
+        pboot.abort(403)
 
-    forbidden_bp = flask.Blueprint("forbidden_bp", __name__)
+    forbidden_bp = pboot.Blueprint("forbidden_bp", __name__)
 
     @forbidden_bp.route("/nope")
     def bp_forbidden():
-        flask.abort(403)
+        pboot.abort(403)
 
     app.register_blueprint(errors)
     app.register_blueprint(forbidden_bp)
@@ -117,7 +117,7 @@ def test_blueprint_app_error_handling(app, client):
     ),
 )
 def test_blueprint_prefix_slash(app, client, prefix, rule, url):
-    bp = flask.Blueprint("test", __name__, url_prefix=prefix)
+    bp = pboot.Blueprint("test", __name__, url_prefix=prefix)
 
     @bp.route(rule)
     def index():
@@ -128,7 +128,7 @@ def test_blueprint_prefix_slash(app, client, prefix, rule, url):
 
 
 def test_blueprint_url_defaults(app, client):
-    bp = flask.Blueprint("test", __name__)
+    bp = pboot.Blueprint("test", __name__)
 
     @bp.route("/foo", defaults={"baz": 42})
     def foo(bar, baz):
@@ -148,23 +148,23 @@ def test_blueprint_url_defaults(app, client):
 
 
 def test_blueprint_url_processors(app, client):
-    bp = flask.Blueprint("frontend", __name__, url_prefix="/<lang_code>")
+    bp = pboot.Blueprint("frontend", __name__, url_prefix="/<lang_code>")
 
     @bp.url_defaults
     def add_language_code(endpoint, values):
-        values.setdefault("lang_code", flask.g.lang_code)
+        values.setdefault("lang_code", pboot.g.lang_code)
 
     @bp.url_value_preprocessor
     def pull_lang_code(endpoint, values):
-        flask.g.lang_code = values.pop("lang_code")
+        pboot.g.lang_code = values.pop("lang_code")
 
     @bp.route("/")
     def index():
-        return flask.url_for(".about")
+        return pboot.url_for(".about")
 
     @bp.route("/about")
     def about():
-        return flask.url_for(".index")
+        return pboot.url_for(".index")
 
     app.register_blueprint(bp)
 
@@ -205,21 +205,21 @@ def test_templates_and_static(test_apps):
 
     with app.test_request_context():
         assert (
-            flask.url_for("admin.static", filename="test.txt")
+            pboot.url_for("admin.static", filename="test.txt")
             == "/admin/static/test.txt"
         )
 
     with app.test_request_context():
         with pytest.raises(TemplateNotFound) as e:
-            flask.render_template("missing.html")
+            pboot.render_template("missing.html")
         assert e.value.name == "missing.html"
 
-    with flask.Flask(__name__).test_request_context():
-        assert flask.render_template("nested/nested.txt") == "I'm nested"
+    with pboot.Pboot(__name__).test_request_context():
+        assert pboot.render_template("nested/nested.txt") == "I'm nested"
 
 
-def test_default_static_max_age(app: flask.Flask) -> None:
-    class MyBlueprint(flask.Blueprint):
+def test_default_static_max_age(app: pboot.Pboot) -> None:
+    class MyBlueprint(pboot.Blueprint):
         def get_send_file_max_age(self, filename):
             return 100
 
@@ -241,24 +241,24 @@ def test_templates_list(test_apps):
 
 def test_dotted_name_not_allowed(app, client):
     with pytest.raises(ValueError):
-        flask.Blueprint("app.ui", __name__)
+        pboot.Blueprint("app.ui", __name__)
 
 
 def test_empty_name_not_allowed(app, client):
     with pytest.raises(ValueError):
-        flask.Blueprint("", __name__)
+        pboot.Blueprint("", __name__)
 
 
 def test_dotted_names_from_app(app, client):
-    test = flask.Blueprint("test", __name__)
+    test = pboot.Blueprint("test", __name__)
 
     @app.route("/")
     def app_index():
-        return flask.url_for("test.index")
+        return pboot.url_for("test.index")
 
     @test.route("/test/")
     def index():
-        return flask.url_for("app_index")
+        return pboot.url_for("app_index")
 
     app.register_blueprint(test)
 
@@ -267,7 +267,7 @@ def test_dotted_names_from_app(app, client):
 
 
 def test_empty_url_defaults(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.route("/", defaults={"page": 1})
     @bp.route("/page/<int:page>")
@@ -281,29 +281,29 @@ def test_empty_url_defaults(app, client):
 
 
 def test_route_decorator_custom_endpoint(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.route("/foo")
     def foo():
-        return flask.request.endpoint
+        return pboot.request.endpoint
 
     @bp.route("/bar", endpoint="bar")
     def foo_bar():
-        return flask.request.endpoint
+        return pboot.request.endpoint
 
     @bp.route("/bar/123", endpoint="123")
     def foo_bar_foo():
-        return flask.request.endpoint
+        return pboot.request.endpoint
 
     @bp.route("/bar/foo")
     def bar_foo():
-        return flask.request.endpoint
+        return pboot.request.endpoint
 
     app.register_blueprint(bp, url_prefix="/py")
 
     @app.route("/")
     def index():
-        return flask.request.endpoint
+        return pboot.request.endpoint
 
     assert client.get("/").data == b"index"
     assert client.get("/py/foo").data == b"bp.foo"
@@ -313,7 +313,7 @@ def test_route_decorator_custom_endpoint(app, client):
 
 
 def test_route_decorator_custom_endpoint_with_dots(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     with pytest.raises(ValueError):
         bp.route("/", endpoint="a.b")(lambda: "")
@@ -335,11 +335,11 @@ def test_endpoint_decorator(app, client):
 
     app.url_map.add(Rule("/foo", endpoint="bar"))
 
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.endpoint("bar")
     def foobar():
-        return flask.request.endpoint
+        return pboot.request.endpoint
 
     app.register_blueprint(bp, url_prefix="/bp_prefix")
 
@@ -348,7 +348,7 @@ def test_endpoint_decorator(app, client):
 
 
 def test_template_filter(app):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_filter()
     def my_reverse(s):
@@ -385,7 +385,7 @@ def test_template_filter(app):
 
 
 def test_add_template_filter(app):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     def my_reverse(s):
         return s[::-1]
@@ -398,7 +398,7 @@ def test_add_template_filter(app):
 
 
 def test_template_filter_with_name(app):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_filter("strrev")
     def my_reverse(s):
@@ -411,7 +411,7 @@ def test_template_filter_with_name(app):
 
 
 def test_add_template_filter_with_name(app):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     def my_reverse(s):
         return s[::-1]
@@ -424,7 +424,7 @@ def test_add_template_filter_with_name(app):
 
 
 def test_template_filter_with_template(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_filter()
     def super_reverse(s):
@@ -434,7 +434,7 @@ def test_template_filter_with_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_filter.html", value="abcd")
+        return pboot.render_template("template_filter.html", value="abcd")
 
     rv = client.get("/")
     assert rv.data == b"dcba"
@@ -443,9 +443,9 @@ def test_template_filter_with_template(app, client):
 def test_template_filter_after_route_with_template(app, client):
     @app.route("/")
     def index():
-        return flask.render_template("template_filter.html", value="abcd")
+        return pboot.render_template("template_filter.html", value="abcd")
 
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_filter()
     def super_reverse(s):
@@ -457,7 +457,7 @@ def test_template_filter_after_route_with_template(app, client):
 
 
 def test_add_template_filter_with_template(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     def super_reverse(s):
         return s[::-1]
@@ -467,14 +467,14 @@ def test_add_template_filter_with_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_filter.html", value="abcd")
+        return pboot.render_template("template_filter.html", value="abcd")
 
     rv = client.get("/")
     assert rv.data == b"dcba"
 
 
 def test_template_filter_with_name_and_template(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_filter("super_reverse")
     def my_reverse(s):
@@ -484,14 +484,14 @@ def test_template_filter_with_name_and_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_filter.html", value="abcd")
+        return pboot.render_template("template_filter.html", value="abcd")
 
     rv = client.get("/")
     assert rv.data == b"dcba"
 
 
 def test_add_template_filter_with_name_and_template(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     def my_reverse(s):
         return s[::-1]
@@ -501,14 +501,14 @@ def test_add_template_filter_with_name_and_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_filter.html", value="abcd")
+        return pboot.render_template("template_filter.html", value="abcd")
 
     rv = client.get("/")
     assert rv.data == b"dcba"
 
 
 def test_template_test(app):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_test()
     def is_boolean(value):
@@ -545,7 +545,7 @@ def test_template_test(app):
 
 
 def test_add_template_test(app):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     def is_boolean(value):
         return isinstance(value, bool)
@@ -558,7 +558,7 @@ def test_add_template_test(app):
 
 
 def test_template_test_with_name(app):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_test("boolean")
     def is_boolean(value):
@@ -571,7 +571,7 @@ def test_template_test_with_name(app):
 
 
 def test_add_template_test_with_name(app):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     def is_boolean(value):
         return isinstance(value, bool)
@@ -584,7 +584,7 @@ def test_add_template_test_with_name(app):
 
 
 def test_template_test_with_template(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_test()
     def boolean(value):
@@ -594,7 +594,7 @@ def test_template_test_with_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_test.html", value=False)
+        return pboot.render_template("template_test.html", value=False)
 
     rv = client.get("/")
     assert b"Success!" in rv.data
@@ -603,9 +603,9 @@ def test_template_test_with_template(app, client):
 def test_template_test_after_route_with_template(app, client):
     @app.route("/")
     def index():
-        return flask.render_template("template_test.html", value=False)
+        return pboot.render_template("template_test.html", value=False)
 
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_test()
     def boolean(value):
@@ -617,7 +617,7 @@ def test_template_test_after_route_with_template(app, client):
 
 
 def test_add_template_test_with_template(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     def boolean(value):
         return isinstance(value, bool)
@@ -627,14 +627,14 @@ def test_add_template_test_with_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_test.html", value=False)
+        return pboot.render_template("template_test.html", value=False)
 
     rv = client.get("/")
     assert b"Success!" in rv.data
 
 
 def test_template_test_with_name_and_template(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_test("boolean")
     def is_boolean(value):
@@ -644,14 +644,14 @@ def test_template_test_with_name_and_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_test.html", value=False)
+        return pboot.render_template("template_test.html", value=False)
 
     rv = client.get("/")
     assert b"Success!" in rv.data
 
 
 def test_add_template_test_with_name_and_template(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     def is_boolean(value):
         return isinstance(value, bool)
@@ -661,17 +661,17 @@ def test_add_template_test_with_name_and_template(app, client):
 
     @app.route("/")
     def index():
-        return flask.render_template("template_test.html", value=False)
+        return pboot.render_template("template_test.html", value=False)
 
     rv = client.get("/")
     assert b"Success!" in rv.data
 
 
 def test_context_processing(app, client):
-    answer_bp = flask.Blueprint("answer_bp", __name__)
+    answer_bp = pboot.Blueprint("answer_bp", __name__)
 
     def template_string():
-        return flask.render_template_string(
+        return pboot.render_template_string(
             "{% if notanswer %}{{ notanswer }} is not the answer. {% endif %}"
             "{% if answer %}{{ answer }} is the answer.{% endif %}"
         )
@@ -709,7 +709,7 @@ def test_context_processing(app, client):
 
 
 def test_template_global(app):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     @bp.app_template_global()
     def get_answer():
@@ -749,21 +749,21 @@ def test_template_global(app):
     assert app.jinja_env.globals["my_get_stuff_custom_name_3"](), "get_stuff_3"
 
     with app.app_context():
-        rv = flask.render_template_string("{{ get_answer() }}")
+        rv = pboot.render_template_string("{{ get_answer() }}")
         assert rv == "42"
 
-        rv = flask.render_template_string("{{ get_stuff_1() }}")
+        rv = pboot.render_template_string("{{ get_stuff_1() }}")
         assert rv == "get_stuff_1"
 
-        rv = flask.render_template_string("{{ my_get_stuff_custom_name_2() }}")
+        rv = pboot.render_template_string("{{ my_get_stuff_custom_name_2() }}")
         assert rv == "get_stuff_2"
 
-        rv = flask.render_template_string("{{ my_get_stuff_custom_name_3() }}")
+        rv = pboot.render_template_string("{{ my_get_stuff_custom_name_3() }}")
         assert rv == "get_stuff_3"
 
 
 def test_request_processing(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
     evts = []
 
     @bp.before_request
@@ -794,7 +794,7 @@ def test_request_processing(app, client):
 
 
 def test_app_request_processing(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
     evts = []
 
     @bp.before_app_request
@@ -833,25 +833,25 @@ def test_app_request_processing(app, client):
 
 
 def test_app_url_processors(app, client):
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
 
     # Register app-wide url defaults and preprocessor on blueprint
     @bp.app_url_defaults
     def add_language_code(endpoint, values):
-        values.setdefault("lang_code", flask.g.lang_code)
+        values.setdefault("lang_code", pboot.g.lang_code)
 
     @bp.app_url_value_preprocessor
     def pull_lang_code(endpoint, values):
-        flask.g.lang_code = values.pop("lang_code")
+        pboot.g.lang_code = values.pop("lang_code")
 
     # Register route rules at the app level
     @app.route("/<lang_code>/")
     def index():
-        return flask.url_for("about")
+        return pboot.url_for("about")
 
     @app.route("/<lang_code>/about")
     def about():
-        return flask.url_for("index")
+        return pboot.url_for("index")
 
     app.register_blueprint(bp)
 
@@ -860,9 +860,9 @@ def test_app_url_processors(app, client):
 
 
 def test_nested_blueprint(app, client):
-    parent = flask.Blueprint("parent", __name__)
-    child = flask.Blueprint("child", __name__)
-    grandchild = flask.Blueprint("grandchild", __name__)
+    parent = pboot.Blueprint("parent", __name__)
+    child = pboot.Blueprint("child", __name__)
+    grandchild = pboot.Blueprint("grandchild", __name__)
 
     @parent.errorhandler(403)
     def forbidden(e):
@@ -874,7 +874,7 @@ def test_nested_blueprint(app, client):
 
     @parent.route("/no")
     def parent_no():
-        flask.abort(403)
+        pboot.abort(403)
 
     @child.route("/")
     def child_index():
@@ -882,7 +882,7 @@ def test_nested_blueprint(app, client):
 
     @child.route("/no")
     def child_no():
-        flask.abort(403)
+        pboot.abort(403)
 
     @grandchild.errorhandler(403)
     def grandchild_forbidden(e):
@@ -894,7 +894,7 @@ def test_nested_blueprint(app, client):
 
     @grandchild.route("/no")
     def grandchild_no():
-        flask.abort(403)
+        pboot.abort(403)
 
     child.register_blueprint(grandchild, url_prefix="/grandchild")
     parent.register_blueprint(child, url_prefix="/child")
@@ -909,24 +909,24 @@ def test_nested_blueprint(app, client):
 
 
 def test_nested_callback_order(app, client):
-    parent = flask.Blueprint("parent", __name__)
-    child = flask.Blueprint("child", __name__)
+    parent = pboot.Blueprint("parent", __name__)
+    child = pboot.Blueprint("child", __name__)
 
     @app.before_request
     def app_before1():
-        flask.g.setdefault("seen", []).append("app_1")
+        pboot.g.setdefault("seen", []).append("app_1")
 
     @app.teardown_request
     def app_teardown1(e=None):
-        assert flask.g.seen.pop() == "app_1"
+        assert pboot.g.seen.pop() == "app_1"
 
     @app.before_request
     def app_before2():
-        flask.g.setdefault("seen", []).append("app_2")
+        pboot.g.setdefault("seen", []).append("app_2")
 
     @app.teardown_request
     def app_teardown2(e=None):
-        assert flask.g.seen.pop() == "app_2"
+        assert pboot.g.seen.pop() == "app_2"
 
     @app.context_processor
     def app_ctx():
@@ -934,19 +934,19 @@ def test_nested_callback_order(app, client):
 
     @parent.before_request
     def parent_before1():
-        flask.g.setdefault("seen", []).append("parent_1")
+        pboot.g.setdefault("seen", []).append("parent_1")
 
     @parent.teardown_request
     def parent_teardown1(e=None):
-        assert flask.g.seen.pop() == "parent_1"
+        assert pboot.g.seen.pop() == "parent_1"
 
     @parent.before_request
     def parent_before2():
-        flask.g.setdefault("seen", []).append("parent_2")
+        pboot.g.setdefault("seen", []).append("parent_2")
 
     @parent.teardown_request
     def parent_teardown2(e=None):
-        assert flask.g.seen.pop() == "parent_2"
+        assert pboot.g.seen.pop() == "parent_2"
 
     @parent.context_processor
     def parent_ctx():
@@ -954,19 +954,19 @@ def test_nested_callback_order(app, client):
 
     @child.before_request
     def child_before1():
-        flask.g.setdefault("seen", []).append("child_1")
+        pboot.g.setdefault("seen", []).append("child_1")
 
     @child.teardown_request
     def child_teardown1(e=None):
-        assert flask.g.seen.pop() == "child_1"
+        assert pboot.g.seen.pop() == "child_1"
 
     @child.before_request
     def child_before2():
-        flask.g.setdefault("seen", []).append("child_2")
+        pboot.g.setdefault("seen", []).append("child_2")
 
     @child.teardown_request
     def child_teardown2(e=None):
-        assert flask.g.seen.pop() == "child_2"
+        assert pboot.g.seen.pop() == "child_2"
 
     @child.context_processor
     def child_ctx():
@@ -974,11 +974,11 @@ def test_nested_callback_order(app, client):
 
     @child.route("/a")
     def a():
-        return ", ".join(flask.g.seen)
+        return ", ".join(pboot.g.seen)
 
     @child.route("/b")
     def b():
-        return flask.render_template_string("{{ key }}")
+        return pboot.render_template_string("{{ key }}")
 
     parent.register_blueprint(child)
     app.register_blueprint(parent)
@@ -1005,8 +1005,8 @@ def test_nesting_url_prefixes(
     app,
     client,
 ) -> None:
-    parent = flask.Blueprint("parent", __name__, url_prefix=parent_init)
-    child = flask.Blueprint("child", __name__, url_prefix=child_init)
+    parent = pboot.Blueprint("parent", __name__, url_prefix=parent_init)
+    child = pboot.Blueprint("child", __name__, url_prefix=child_init)
 
     @child.route("/")
     def index():
@@ -1024,8 +1024,8 @@ def test_nesting_subdomains(app, client) -> None:
     app.config["SERVER_NAME"] = "example.test"
     client.allow_subdomain_redirects = True
 
-    parent = flask.Blueprint("parent", __name__)
-    child = flask.Blueprint("child", __name__)
+    parent = pboot.Blueprint("parent", __name__)
+    child = pboot.Blueprint("child", __name__)
 
     @child.route("/child/")
     def index():
@@ -1043,8 +1043,8 @@ def test_child_and_parent_subdomain(app, client) -> None:
     app.config["SERVER_NAME"] = "example.test"
     client.allow_subdomain_redirects = True
 
-    parent = flask.Blueprint("parent", __name__)
-    child = flask.Blueprint("child", __name__, subdomain="api")
+    parent = pboot.Blueprint("parent", __name__)
+    child = pboot.Blueprint("child", __name__, subdomain="api")
 
     @child.route("/")
     def index():
@@ -1061,8 +1061,8 @@ def test_child_and_parent_subdomain(app, client) -> None:
 
 
 def test_unique_blueprint_names(app, client) -> None:
-    bp = flask.Blueprint("bp", __name__)
-    bp2 = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
+    bp2 = pboot.Blueprint("bp", __name__)
 
     app.register_blueprint(bp)
 
@@ -1078,22 +1078,22 @@ def test_unique_blueprint_names(app, client) -> None:
 
 
 def test_self_registration(app, client) -> None:
-    bp = flask.Blueprint("bp", __name__)
+    bp = pboot.Blueprint("bp", __name__)
     with pytest.raises(ValueError):
         bp.register_blueprint(bp)
 
 
 def test_blueprint_renaming(app, client) -> None:
-    bp = flask.Blueprint("bp", __name__)
-    bp2 = flask.Blueprint("bp2", __name__)
+    bp = pboot.Blueprint("bp", __name__)
+    bp2 = pboot.Blueprint("bp2", __name__)
 
     @bp.get("/")
     def index():
-        return flask.request.endpoint
+        return pboot.request.endpoint
 
     @bp.get("/error")
     def error():
-        flask.abort(403)
+        pboot.abort(403)
 
     @bp.errorhandler(403)
     def forbidden(_: Exception):
@@ -1101,7 +1101,7 @@ def test_blueprint_renaming(app, client) -> None:
 
     @bp2.get("/")
     def index2():
-        return flask.request.endpoint
+        return pboot.request.endpoint
 
     bp.register_blueprint(bp2, url_prefix="/a", name="sub")
     app.register_blueprint(bp, url_prefix="/a")

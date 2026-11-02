@@ -1,4 +1,4 @@
-# This file was part of Flask-CLI and was modified under the terms of
+# This file was part of Pboot-CLI and was modified under the terms of
 # its Revised BSD License. Copyright © 2015 CERN.
 import importlib.metadata
 import os
@@ -13,20 +13,20 @@ import click
 import pytest
 from click.testing import CliRunner
 
-from flask import Blueprint
-from flask import current_app
-from flask import Flask
-from flask.cli import AppGroup
-from flask.cli import find_best_app
-from flask.cli import FlaskGroup
-from flask.cli import get_version
-from flask.cli import load_dotenv
-from flask.cli import locate_app
-from flask.cli import NoAppException
-from flask.cli import prepare_import
-from flask.cli import run_command
-from flask.cli import ScriptInfo
-from flask.cli import with_appcontext
+from pboot import Blueprint
+from pboot import current_app
+from pboot import Pboot
+from pboot.cli import AppGroup
+from pboot.cli import find_best_app
+from pboot.cli import PbootGroup
+from pboot.cli import get_version
+from pboot.cli import load_dotenv
+from pboot.cli import locate_app
+from pboot.cli import NoAppException
+from pboot.cli import prepare_import
+from pboot.cli import run_command
+from pboot.cli import ScriptInfo
+from pboot.cli import with_appcontext
 
 cwd = Path.cwd()
 test_path = (Path(__file__) / ".." / "test_apps").resolve()
@@ -46,62 +46,62 @@ def test_cli_name(test_apps):
 
 def test_find_best_app(test_apps):
     class Module:
-        app = Flask("appname")
+        app = Pboot("appname")
 
     assert find_best_app(Module) == Module.app
 
     class Module:
-        application = Flask("appname")
+        application = Pboot("appname")
 
     assert find_best_app(Module) == Module.application
 
     class Module:
-        myapp = Flask("appname")
+        myapp = Pboot("appname")
 
     assert find_best_app(Module) == Module.myapp
 
     class Module:
         @staticmethod
         def create_app():
-            return Flask("appname")
+            return Pboot("appname")
 
     app = find_best_app(Module)
-    assert isinstance(app, Flask)
+    assert isinstance(app, Pboot)
     assert app.name == "appname"
 
     class Module:
         @staticmethod
         def create_app(**kwargs):
-            return Flask("appname")
+            return Pboot("appname")
 
     app = find_best_app(Module)
-    assert isinstance(app, Flask)
+    assert isinstance(app, Pboot)
     assert app.name == "appname"
 
     class Module:
         @staticmethod
         def make_app():
-            return Flask("appname")
+            return Pboot("appname")
 
     app = find_best_app(Module)
-    assert isinstance(app, Flask)
+    assert isinstance(app, Pboot)
     assert app.name == "appname"
 
     class Module:
-        myapp = Flask("appname1")
+        myapp = Pboot("appname1")
 
         @staticmethod
         def create_app():
-            return Flask("appname2")
+            return Pboot("appname2")
 
     assert find_best_app(Module) == Module.myapp
 
     class Module:
-        myapp = Flask("appname1")
+        myapp = Pboot("appname1")
 
         @staticmethod
         def create_app():
-            return Flask("appname2")
+            return Pboot("appname2")
 
     assert find_best_app(Module) == Module.myapp
 
@@ -111,15 +111,15 @@ def test_find_best_app(test_apps):
     pytest.raises(NoAppException, find_best_app, Module)
 
     class Module:
-        myapp1 = Flask("appname1")
-        myapp2 = Flask("appname2")
+        myapp1 = Pboot("appname1")
+        myapp2 = Pboot("appname2")
 
     pytest.raises(NoAppException, find_best_app, Module)
 
     class Module:
         @staticmethod
         def create_app(foo, bar):
-            return Flask("appname2")
+            return Pboot("appname2")
 
     pytest.raises(NoAppException, find_best_app, Module)
 
@@ -239,7 +239,7 @@ def test_get_version(test_apps, capsys):
     get_version(ctx, None, "test")
     out, err = capsys.readouterr()
     assert f"Python {platform.python_version()}" in out
-    assert f"Flask {importlib.metadata.version('flask')}" in out
+    assert f"Pboot {importlib.metadata.version('pboot')}" in out
     assert f"Werkzeug {importlib.metadata.version('werkzeug')}" in out
 
 
@@ -262,7 +262,7 @@ def test_scriptinfo(test_apps, monkeypatch):
     assert obj.load_app() is app
 
     def create_app():
-        return Flask("createapp")
+        return Pboot("createapp")
 
     obj = ScriptInfo(create_app=create_app)
     app = obj.load_app()
@@ -298,7 +298,7 @@ def test_app_cli_has_app_context(app, runner):
         same_app = current_app._get_current_object() is app
         return same_app, value
 
-    cli = FlaskGroup(create_app=lambda: app)
+    cli = PbootGroup(create_app=lambda: app)
     result = runner.invoke(cli, ["check", "x"], standalone_mode=False)
     assert result.return_value == (True, True)
 
@@ -309,7 +309,7 @@ def test_with_appcontext(runner):
     def testcmd():
         click.echo(current_app.name)
 
-    obj = ScriptInfo(create_app=lambda: Flask("testapp"))
+    obj = ScriptInfo(create_app=lambda: Pboot("testapp"))
 
     result = runner.invoke(testcmd, obj=obj)
     assert result.exit_code == 0
@@ -333,7 +333,7 @@ def test_appgroup_app_context(runner):
     def test2():
         click.echo(current_app.name)
 
-    obj = ScriptInfo(create_app=lambda: Flask("testappgroup"))
+    obj = ScriptInfo(create_app=lambda: Pboot("testappgroup"))
 
     result = runner.invoke(cli, ["test"], obj=obj)
     assert result.exit_code == 0
@@ -344,11 +344,11 @@ def test_appgroup_app_context(runner):
     assert result.output == "testappgroup\n"
 
 
-def test_flaskgroup_app_context(runner):
+def test_pbootgroup_app_context(runner):
     def create_app():
-        return Flask("flaskgroup")
+        return Pboot("pbootgroup")
 
-    @click.group(cls=FlaskGroup, create_app=create_app)
+    @click.group(cls=PbootGroup, create_app=create_app)
     def cli(**params):
         pass
 
@@ -358,17 +358,17 @@ def test_flaskgroup_app_context(runner):
 
     result = runner.invoke(cli, ["test"])
     assert result.exit_code == 0
-    assert result.output == "flaskgroup\n"
+    assert result.output == "pbootgroup\n"
 
 
 @pytest.mark.parametrize("set_debug_flag", (True, False))
-def test_flaskgroup_debug(runner, set_debug_flag):
+def test_pbootgroup_debug(runner, set_debug_flag):
     def create_app():
-        app = Flask("flaskgroup")
+        app = Pboot("pbootgroup")
         app.debug = True
         return app
 
-    @click.group(cls=FlaskGroup, create_app=create_app, set_debug_flag=set_debug_flag)
+    @click.group(cls=PbootGroup, create_app=create_app, set_debug_flag=set_debug_flag)
     def cli(**params):
         pass
 
@@ -381,21 +381,21 @@ def test_flaskgroup_debug(runner, set_debug_flag):
     assert result.output == f"{not set_debug_flag}\n"
 
 
-def test_flaskgroup_nested(app, runner):
+def test_pbootgroup_nested(app, runner):
     cli = click.Group("cli")
-    flask_group = FlaskGroup(name="flask", create_app=lambda: app)
-    cli.add_command(flask_group)
+    pboot_group = PbootGroup(name="pboot", create_app=lambda: app)
+    cli.add_command(pboot_group)
 
-    @flask_group.command()
+    @pboot_group.command()
     def show():
         click.echo(current_app.name)
 
-    result = runner.invoke(cli, ["flask", "show"])
-    assert result.output == "flask_test\n"
+    result = runner.invoke(cli, ["pboot", "show"])
+    assert result.output == "pboot_test\n"
 
 
 def test_no_command_echo_loading_error():
-    from flask.cli import cli
+    from pboot.cli import cli
 
     try:
         runner = CliRunner(mix_stderr=False)
@@ -405,12 +405,12 @@ def test_no_command_echo_loading_error():
 
     result = runner.invoke(cli, ["missing"])
     assert result.exit_code == 2
-    assert "FLASK_APP" in result.stderr
+    assert "PBOOT_APP" in result.stderr
     assert "Usage:" in result.stderr
 
 
 def test_help_echo_loading_error():
-    from flask.cli import cli
+    from pboot.cli import cli
 
     try:
         runner = CliRunner(mix_stderr=False)
@@ -420,7 +420,7 @@ def test_help_echo_loading_error():
 
     result = runner.invoke(cli, ["--help"])
     assert result.exit_code == 0
-    assert "FLASK_APP" in result.stderr
+    assert "PBOOT_APP" in result.stderr
     assert "Usage:" in result.stdout
 
 
@@ -428,7 +428,7 @@ def test_help_echo_exception():
     def create_app():
         raise Exception("oh no")
 
-    cli = FlaskGroup(create_app=create_app)
+    cli = PbootGroup(create_app=create_app)
 
     try:
         runner = CliRunner(mix_stderr=False)
@@ -445,7 +445,7 @@ def test_help_echo_exception():
 class TestRoutes:
     @pytest.fixture
     def app(self):
-        app = Flask(__name__)
+        app = Pboot(__name__)
         app.add_url_rule(
             "/get_post/<int:x>/<int:y>",
             methods=["GET", "POST"],
@@ -456,7 +456,7 @@ class TestRoutes:
 
     @pytest.fixture
     def invoke(self, app, runner):
-        cli = FlaskGroup(create_app=lambda: app)
+        cli = PbootGroup(create_app=lambda: app)
         return partial(runner.invoke, cli)
 
     def expect_order(self, order, output):
@@ -493,26 +493,26 @@ class TestRoutes:
         assert "GET, HEAD, OPTIONS, POST" in output
 
     def test_no_routes(self, runner):
-        app = Flask(__name__, static_folder=None)
-        cli = FlaskGroup(create_app=lambda: app)
+        app = Pboot(__name__, static_folder=None)
+        cli = PbootGroup(create_app=lambda: app)
         result = runner.invoke(cli, ["routes"])
         assert result.exit_code == 0
         assert "No routes were registered." in result.output
 
     def test_subdomain(self, runner):
-        app = Flask(__name__, static_folder=None)
+        app = Pboot(__name__, static_folder=None)
         app.add_url_rule("/a", subdomain="a", endpoint="a")
         app.add_url_rule("/b", subdomain="b", endpoint="b")
-        cli = FlaskGroup(create_app=lambda: app)
+        cli = PbootGroup(create_app=lambda: app)
         result = runner.invoke(cli, ["routes"])
         assert result.exit_code == 0
         assert "Subdomain" in result.output
 
     def test_host(self, runner):
-        app = Flask(__name__, static_folder=None, host_matching=True)
+        app = Pboot(__name__, static_folder=None, host_matching=True)
         app.add_url_rule("/a", host="a", endpoint="a")
         app.add_url_rule("/b", host="b", endpoint="b")
-        cli = FlaskGroup(create_app=lambda: app)
+        cli = PbootGroup(create_app=lambda: app)
         result = runner.invoke(cli, ["routes"])
         assert result.exit_code == 0
         assert "Host" in result.output
@@ -541,9 +541,9 @@ def test_load_dotenv(monkeypatch):
     monkeypatch.chdir(test_path)
     assert load_dotenv()
     assert Path.cwd() == test_path
-    # .flaskenv doesn't overwrite .env
+    # .pbootenv doesn't overwrite .env
     assert os.environ["FOO"] == "env"
-    # set only in .flaskenv
+    # set only in .pbootenv
     assert os.environ["BAR"] == "bar"
     # set only in .env
     assert os.environ["SPAM"] == "1"
@@ -560,7 +560,7 @@ def test_dotenv_path(monkeypatch):
     for item in ("FOO", "BAR", "EGGS"):
         monkeypatch.delenv(item, False)
 
-    load_dotenv(test_path / ".flaskenv")
+    load_dotenv(test_path / ".pbootenv")
     assert Path.cwd() == cwd
     assert "FOO" in os.environ
 
@@ -577,8 +577,8 @@ def test_dotenv_optional(monkeypatch):
 def test_disable_dotenv_from_env(monkeypatch, runner):
     monkeypatch.delenv("FOO", False)
     monkeypatch.chdir(test_path)
-    monkeypatch.setitem(os.environ, "FLASK_SKIP_DOTENV", "1")
-    runner.invoke(FlaskGroup())
+    monkeypatch.setitem(os.environ, "PBOOT_SKIP_DOTENV", "1")
+    runner.invoke(PbootGroup())
     assert "FOO" not in os.environ
 
 
@@ -625,7 +625,7 @@ def test_run_cert_import(monkeypatch):
         run_command.make_context("run", ["--cert", "not_here"])
 
     with pytest.raises(click.BadParameter):
-        run_command.make_context("run", ["--cert", "flask"])
+        run_command.make_context("run", ["--cert", "pboot"])
 
     # SSLContext
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)

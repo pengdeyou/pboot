@@ -3,8 +3,8 @@ View Decorators
 
 Python has a really interesting feature called function decorators.  This
 allows some really neat things for web applications.  Because each view in
-Flask is a function, decorators can be used to inject additional
-functionality to one or more functions.  The :meth:`~flask.Flask.route`
+Pboot is a function, decorators can be used to inject additional
+functionality to one or more functions.  The :meth:`~pboot.Pboot.route`
 decorator is the one you probably used already.  But there are use cases
 for implementing your own decorator.  For instance, imagine you have a
 view that should only be used by people that are logged in.  If a user
@@ -25,7 +25,7 @@ the current user is stored in ``g.user`` and is ``None`` if there is no-one
 logged in. ::
 
     from functools import wraps
-    from flask import g, request, redirect, url_for
+    from pboot import g, request, redirect, url_for
 
     def login_required(f):
         @wraps(f)
@@ -37,7 +37,7 @@ logged in. ::
 
 To use the decorator, apply it as innermost decorator to a view function.
 When applying further decorators, always remember
-that the :meth:`~flask.Flask.route` decorator is the outermost. ::
+that the :meth:`~pboot.Pboot.route` decorator is the outermost. ::
 
     @app.route('/secret_page')
     @login_required
@@ -80,7 +80,7 @@ The decorated function will then work as follows
 Here the code::
 
     from functools import wraps
-    from flask import request
+    from pboot import request
 
     def cached(timeout=5 * 60, key='view/{}'):
         def decorator(f):
@@ -134,7 +134,7 @@ way you can still use the redirect function or return simple strings.
 Here is the code for that decorator::
 
     from functools import wraps
-    from flask import request, render_template
+    from pboot import request, render_template
 
     def templated(template=None):
         def decorator(f):
@@ -160,10 +160,10 @@ When you want to use the werkzeug routing system for more flexibility you
 need to map the endpoint as defined in the :class:`~werkzeug.routing.Rule`
 to a view function. This is possible with this decorator. For example::
 
-    from flask import Flask
+    from pboot import Pboot
     from werkzeug.routing import Rule
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.url_map.add(Rule('/', endpoint='index'))
 
     @app.endpoint('index')

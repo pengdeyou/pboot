@@ -6,15 +6,15 @@ you might want to change depending on the application environment like
 toggling the debug mode, setting the secret key, and other such
 environment-specific things.
 
-The way Flask is designed usually requires the configuration to be
+The way Pboot is designed usually requires the configuration to be
 available when the application starts up.  You can hard code the
 configuration in the code, which for many small applications is not
 actually that bad, but there are better ways.
 
 Independent of how you load your config, there is a config object
 available which holds the loaded configuration values:
-The :attr:`~flask.Flask.config` attribute of the :class:`~flask.Flask`
-object.  This is the place where Flask itself puts certain configuration
+The :attr:`~pboot.Pboot.config` attribute of the :class:`~pboot.Pboot`
+object.  This is the place where Pboot itself puts certain configuration
 values and also where extensions can put their configuration values.  But
 this is also where you can have your own configuration.
 
@@ -22,14 +22,14 @@ this is also where you can have your own configuration.
 Configuration Basics
 --------------------
 
-The :attr:`~flask.Flask.config` is actually a subclass of a dictionary and
+The :attr:`~pboot.Pboot.config` is actually a subclass of a dictionary and
 can be modified just like any dictionary::
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.config['TESTING'] = True
 
 Certain configuration values are also forwarded to the
-:attr:`~flask.Flask` object so you can read and write them from there::
+:attr:`~pboot.Pboot` object so you can read and write them from there::
 
     app.testing = True
 
@@ -47,30 +47,30 @@ Debug Mode
 
 The :data:`DEBUG` config value is special because it may behave inconsistently if
 changed after the app has begun setting up. In order to set debug mode reliably, use the
-``--debug`` option on the ``flask`` or ``flask run`` command. ``flask run`` will use the
+``--debug`` option on the ``pboot`` or ``pboot run`` command. ``pboot run`` will use the
 interactive debugger and reloader by default in debug mode.
 
 .. code-block:: text
 
-    $ flask --app hello run --debug
+    $ pboot --app hello run --debug
 
 Using the option is recommended. While it is possible to set :data:`DEBUG` in your
 config or code, this is strongly discouraged. It can't be read early by the
-``flask run`` command, and some systems or extensions may have already configured
+``pboot run`` command, and some systems or extensions may have already configured
 themselves based on a previous value.
 
 
 Builtin Configuration Values
 ----------------------------
 
-The following configuration values are used internally by Flask:
+The following configuration values are used internally by Pboot:
 
 .. py:data:: DEBUG
 
-    Whether debug mode is enabled. When using ``flask run`` to start the development
+    Whether debug mode is enabled. When using ``pboot run`` to start the development
     server, an interactive debugger will be shown for unhandled exceptions, and the
-    server will be reloaded when code changes. The :attr:`~flask.Flask.debug` attribute
-    maps to this config key. This is set with the ``FLASK_DEBUG`` environment variable.
+    server will be reloaded when code changes. The :attr:`~pboot.Pboot.debug` attribute
+    maps to this config key. This is set with the ``PBOOT_DEBUG`` environment variable.
     It may not behave as expected if set in code.
 
     **Do not enable debug mode when deploying in production.**
@@ -137,7 +137,7 @@ The following configuration values are used internally by Flask:
     Order should not matter, but the default implementation will test the last
     key in the list first, so it might make sense to order oldest to newest.
 
-    Flask's built-in secure cookie session supports this. Extensions that use
+    Pboot's built-in secure cookie session supports this. Extensions that use
     :data:`SECRET_KEY` may not support this yet.
 
     Default: ``None``
@@ -225,7 +225,7 @@ The following configuration values are used internally by Flask:
     number of seconds in the future. Can either be a
     :class:`datetime.timedelta` or an ``int``.
 
-    Flask's default cookie implementation validates that the cryptographic
+    Pboot's default cookie implementation validates that the cryptographic
     signature is not older than this value.
 
     Default: ``timedelta(days=31)`` (``2678400`` seconds)
@@ -242,7 +242,7 @@ The following configuration values are used internally by Flask:
 .. py:data:: USE_X_SENDFILE
 
     When serving files, set the ``X-Sendfile`` header instead of serving the
-    data with Flask. Some web servers, such as Apache, recognize this and serve
+    data with Pboot. Some web servers, such as Apache, recognize this and serve
     the data more efficiently. This only makes sense when using such a server.
 
     Default: ``False``
@@ -252,7 +252,7 @@ The following configuration values are used internally by Flask:
     When serving files, set the cache control max age to this number of
     seconds. Can be a :class:`datetime.timedelta` or an ``int``.
     Override this value on a per-file basis using
-    :meth:`~flask.Flask.get_send_file_max_age` on the application or
+    :meth:`~pboot.Pboot.get_send_file_max_age` on the application or
     blueprint.
 
     If ``None``, ``send_file`` tells the browser to use conditional
@@ -322,7 +322,7 @@ The following configuration values are used internally by Flask:
     The maximum number of bytes that will be read during this request. If
     this limit is exceeded, a 413 :exc:`~werkzeug.exceptions.RequestEntityTooLarge`
     error is raised. If it is set to ``None``, no limit is enforced at the
-    Flask application level. However, if it is ``None`` and the request has no
+    Pboot application level. However, if it is ``None`` and the request has no
     ``Content-Length`` header and the WSGI server does not indicate that it
     terminates the stream, then no data is read to avoid an infinite stream.
 
@@ -340,7 +340,7 @@ The following configuration values are used internally by Flask:
     The maximum size in bytes any non-file form field may be in a
     ``multipart/form-data`` body. If this limit is exceeded, a 413
     :exc:`~werkzeug.exceptions.RequestEntityTooLarge` error is raised. If it is
-    set to ``None``, no limit is enforced at the Flask application level.
+    set to ``None``, no limit is enforced at the Pboot application level.
 
     Each request defaults to this config. It can be set on a specific
     :attr:`.Request.max_form_memory_parts` to apply the limit to that specific
@@ -356,7 +356,7 @@ The following configuration values are used internally by Flask:
     The maximum number of fields that may be present in a
     ``multipart/form-data`` body. If this limit is exceeded, a 413
     :exc:`~werkzeug.exceptions.RequestEntityTooLarge` error is raised. If it
-    is set to ``None``, no limit is enforced at the Flask application level.
+    is set to ``None``, no limit is enforced at the Pboot application level.
 
     Each request defaults to this config. It can be set on a specific
     :attr:`.Request.max_form_parts` to apply the limit to that specific view.
@@ -426,7 +426,7 @@ The following configuration values are used internally by Flask:
     ``LOGGER_NAME`` and ``LOGGER_HANDLER_POLICY`` were removed. See
     :doc:`/logging` for information about configuration.
 
-    Added :data:`ENV` to reflect the :envvar:`FLASK_ENV` environment
+    Added :data:`ENV` to reflect the :envvar:`PBOOT_ENV` environment
     variable.
 
     Added :data:`SESSION_COOKIE_SAMESITE` to control the session
@@ -459,7 +459,7 @@ separately configure it for the specific deployment.
 
 A common pattern is this::
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.config.from_object('yourapplication.default_settings')
     app.config.from_envvar('YOURAPPLICATION_SETTINGS')
 
@@ -476,7 +476,7 @@ in the shell before starting the server:
       .. code-block:: text
 
          $ export YOURAPPLICATION_SETTINGS=/path/to/settings.cfg
-         $ flask run
+         $ pboot run
           * Running on http://127.0.0.1:5000/
 
    .. group-tab:: Fish
@@ -484,7 +484,7 @@ in the shell before starting the server:
       .. code-block:: text
 
          $ set -x YOURAPPLICATION_SETTINGS /path/to/settings.cfg
-         $ flask run
+         $ pboot run
           * Running on http://127.0.0.1:5000/
 
    .. group-tab:: CMD
@@ -492,7 +492,7 @@ in the shell before starting the server:
       .. code-block:: text
 
          > set YOURAPPLICATION_SETTINGS=\path\to\settings.cfg
-         > flask run
+         > pboot run
           * Running on http://127.0.0.1:5000/
 
    .. group-tab:: Powershell
@@ -500,7 +500,7 @@ in the shell before starting the server:
       .. code-block:: text
 
          > $env:YOURAPPLICATION_SETTINGS = "\path\to\settings.cfg"
-         > flask run
+         > pboot run
           * Running on http://127.0.0.1:5000/
 
 The configuration files themselves are actual Python files.  Only values
@@ -515,7 +515,7 @@ Here is an example of a configuration file::
 Make sure to load the configuration very early on, so that extensions have
 the ability to access the configuration when starting up.  There are other
 methods on the config object as well to load from individual files.  For a
-complete reference, read the :class:`~flask.Config` object's
+complete reference, read the :class:`~pboot.Config` object's
 documentation.
 
 
@@ -523,7 +523,7 @@ Configuring from Data Files
 ---------------------------
 
 It is also possible to load configuration from a file in a format of
-your choice using :meth:`~flask.Config.from_file`. For example to load
+your choice using :meth:`~pboot.Config.from_file`. For example to load
 from a TOML file:
 
 .. code-block:: python
@@ -544,9 +544,9 @@ Configuring from Environment Variables
 
 In addition to pointing to configuration files using environment
 variables, you may find it useful (or necessary) to control your
-configuration values directly from the environment. Flask can be
+configuration values directly from the environment. Pboot can be
 instructed to load all environment variables starting with a specific
-prefix into the config using :meth:`~flask.Config.from_prefixed_env`.
+prefix into the config using :meth:`~pboot.Config.from_prefixed_env`.
 
 Environment variables can be set in the shell before starting the
 server:
@@ -557,36 +557,36 @@ server:
 
       .. code-block:: text
 
-         $ export FLASK_SECRET_KEY="5f352379324c22463451387a0aec5d2f"
-         $ export FLASK_MAIL_ENABLED=false
-         $ flask run
+         $ export PBOOT_SECRET_KEY="5f352379324c22463451387a0aec5d2f"
+         $ export PBOOT_MAIL_ENABLED=false
+         $ pboot run
           * Running on http://127.0.0.1:5000/
 
    .. group-tab:: Fish
 
       .. code-block:: text
 
-         $ set -x FLASK_SECRET_KEY "5f352379324c22463451387a0aec5d2f"
-         $ set -x FLASK_MAIL_ENABLED false
-         $ flask run
+         $ set -x PBOOT_SECRET_KEY "5f352379324c22463451387a0aec5d2f"
+         $ set -x PBOOT_MAIL_ENABLED false
+         $ pboot run
           * Running on http://127.0.0.1:5000/
 
    .. group-tab:: CMD
 
       .. code-block:: text
 
-         > set FLASK_SECRET_KEY="5f352379324c22463451387a0aec5d2f"
-         > set FLASK_MAIL_ENABLED=false
-         > flask run
+         > set PBOOT_SECRET_KEY="5f352379324c22463451387a0aec5d2f"
+         > set PBOOT_MAIL_ENABLED=false
+         > pboot run
           * Running on http://127.0.0.1:5000/
 
    .. group-tab:: Powershell
 
       .. code-block:: text
 
-         > $env:FLASK_SECRET_KEY = "5f352379324c22463451387a0aec5d2f"
-         > $env:FLASK_MAIL_ENABLED = "false"
-         > flask run
+         > $env:PBOOT_SECRET_KEY = "5f352379324c22463451387a0aec5d2f"
+         > $env:PBOOT_MAIL_ENABLED = "false"
+         > pboot run
           * Running on http://127.0.0.1:5000/
 
 The variables can then be loaded and accessed via the config with a key
@@ -597,13 +597,13 @@ equal to the environment variable name without the prefix i.e.
     app.config.from_prefixed_env()
     app.config["SECRET_KEY"]  # Is "5f352379324c22463451387a0aec5d2f"
 
-The prefix is ``FLASK_`` by default. This is configurable via the
-``prefix`` argument of :meth:`~flask.Config.from_prefixed_env`.
+The prefix is ``PBOOT_`` by default. This is configurable via the
+``prefix`` argument of :meth:`~pboot.Config.from_prefixed_env`.
 
 Values will be parsed to attempt to convert them to a more specific type
 than strings. By default :func:`json.loads` is used, so any valid JSON
 value is possible, including lists and dicts. This is configurable via
-the ``loads`` argument of :meth:`~flask.Config.from_prefixed_env`.
+the ``loads`` argument of :meth:`~pboot.Config.from_prefixed_env`.
 
 When adding a boolean value with the default JSON parsing, only "true"
 and "false", lowercase, are valid values. Keep in mind that any
@@ -615,7 +615,7 @@ exist on the parent dict will be initialized to an empty dict.
 
 .. code-block:: text
 
-    $ export FLASK_MYAPI__credentials__username=user123
+    $ export PBOOT_MYAPI__credentials__username=user123
 
 .. code-block:: python
 
@@ -626,7 +626,7 @@ the above example would end up as ``MYAPI__CREDENTIALS__USERNAME``.
 
 For even more config loading features, including merging and
 case-insensitive Windows support, try a dedicated library such as
-Dynaconf_, which includes integration with Flask.
+Dynaconf_, which includes integration with Pboot.
 
 .. _Dynaconf: https://www.dynaconf.com/
 
@@ -664,7 +664,7 @@ configuration that is always loaded and part of the version control, and a
 separate configuration that overrides the values as necessary as mentioned
 in the example above::
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.config.from_object('yourapplication.default_settings')
     app.config.from_envvar('YOURAPPLICATION_SETTINGS')
 
@@ -697,13 +697,13 @@ configuration::
         TESTING = True
 
 To enable such a config you just have to call into
-:meth:`~flask.Config.from_object`::
+:meth:`~pboot.Config.from_object`::
 
     app.config.from_object('configmodule.ProductionConfig')
 
-Note that :meth:`~flask.Config.from_object` does not instantiate the class
+Note that :meth:`~pboot.Config.from_object` does not instantiate the class
 object. If you need to instantiate the class, such as to access a property,
-then you must do so before calling :meth:`~flask.Config.from_object`::
+then you must do so before calling :meth:`~pboot.Config.from_object`::
 
     from configmodule import ProductionConfig
     app.config.from_object(ProductionConfig())
@@ -762,25 +762,25 @@ Instance Folders
 
 .. versionadded:: 0.8
 
-Flask 0.8 introduces instance folders.  Flask for a long time made it
+Pboot 0.8 introduces instance folders.  Pboot for a long time made it
 possible to refer to paths relative to the application's folder directly
-(via :attr:`Flask.root_path`).  This was also how many developers loaded
+(via :attr:`Pboot.root_path`).  This was also how many developers loaded
 configurations stored next to the application.  Unfortunately however this
 only works well if applications are not packages in which case the root
 path refers to the contents of the package.
 
-With Flask 0.8 a new attribute was introduced:
-:attr:`Flask.instance_path`.  It refers to a new concept called the
+With Pboot 0.8 a new attribute was introduced:
+:attr:`Pboot.instance_path`.  It refers to a new concept called the
 “instance folder”.  The instance folder is designed to not be under
 version control and be deployment specific.  It's the perfect place to
 drop things that either change at runtime or configuration files.
 
 You can either explicitly provide the path of the instance folder when
-creating the Flask application or you can let Flask autodetect the
+creating the Pboot application or you can let Pboot autodetect the
 instance folder.  For explicit configuration use the `instance_path`
 parameter::
 
-    app = Flask(__name__, instance_path='/path/to/instance/folder')
+    app = Pboot(__name__, instance_path='/path/to/instance/folder')
 
 Please keep in mind that this path *must* be absolute when provided.
 
@@ -814,19 +814,19 @@ paths in config files can be flipped between “relative to the application
 root” (the default) to “relative to instance folder” via the
 `instance_relative_config` switch to the application constructor::
 
-    app = Flask(__name__, instance_relative_config=True)
+    app = Pboot(__name__, instance_relative_config=True)
 
-Here is a full example of how to configure Flask to preload the config
+Here is a full example of how to configure Pboot to preload the config
 from a module and then override the config from a file in the instance
 folder if it exists::
 
-    app = Flask(__name__, instance_relative_config=True)
+    app = Pboot(__name__, instance_relative_config=True)
     app.config.from_object('yourapplication.default_settings')
     app.config.from_pyfile('application.cfg', silent=True)
 
 The path to the instance folder can be found via the
-:attr:`Flask.instance_path`.  Flask also provides a shortcut to open a
-file from the instance folder with :meth:`Flask.open_instance_resource`.
+:attr:`Pboot.instance_path`.  Pboot also provides a shortcut to open a
+file from the instance folder with :meth:`Pboot.open_instance_resource`.
 
 Example usage for both::
 

@@ -1,14 +1,14 @@
-Flask Extension Development
+Pboot Extension Development
 ===========================
 
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
-Extensions are extra packages that add functionality to a Flask
-application. While `PyPI`_ contains many Flask extensions, you may not
+Extensions are extra packages that add functionality to a Pboot
+application. While `PyPI`_ contains many Pboot extensions, you may not
 find one that fits your need. If this is the case, you can create your
 own, and publish it for others to use as well.
 
-This guide will show how to create a Flask extension, and some of the
+This guide will show how to create a Pboot extension, and some of the
 common patterns and requirements involved. Since extensions can do
 anything, this guide won't be able to cover every possibility.
 
@@ -25,7 +25,7 @@ only work if collaboration happens early.
 Naming
 ------
 
-A Flask extension typically has ``flask`` in its name as a prefix or
+A Pboot extension typically has ``pboot`` in its name as a prefix or
 suffix. If it wraps another library, it should include the library name
 as well. This makes it easy to search for extensions, and makes their
 purpose clearer.
@@ -39,10 +39,10 @@ library, prefer using the same case as that library's name.
 
 Here are some example install and import names:
 
--   ``Flask-Name`` imported as ``flask_name``
--   ``flask-name-lower`` imported as ``flask_name_lower``
--   ``Flask-ComboName`` imported as ``flask_comboname``
--   ``Name-Flask`` imported as ``name_flask``
+-   ``Pboot-Name`` imported as ``pboot_name``
+-   ``pboot-name-lower`` imported as ``pboot_name_lower``
+-   ``Pboot-ComboName`` imported as ``pboot_comboname``
+-   ``Name-Pboot`` imported as ``name_pboot``
 
 
 The Extension Class and Initialization
@@ -79,7 +79,7 @@ configurations easier.
     hello = HelloExtension()
 
     def create_app():
-        app = Flask(__name__)
+        app = Pboot(__name__)
         hello.init_app(app)
         return app
 
@@ -88,23 +88,23 @@ application. This means that other modules in a user's project can do
 ``from project import hello`` and use the extension in blueprints before
 the app exists.
 
-The :attr:`Flask.extensions` dict can be used to store a reference to
+The :attr:`Pboot.extensions` dict can be used to store a reference to
 the extension on the application, or some other state specific to the
 application. Be aware that this is a single namespace, so use a name
 unique to your extension, such as the extension's name without the
-"flask" prefix.
+"pboot" prefix.
 
 
 Adding Behavior
 ---------------
 
 There are many ways that an extension can add behavior. Any setup
-methods that are available on the :class:`Flask` object can be used
+methods that are available on the :class:`Pboot` object can be used
 during an extension's ``init_app`` method.
 
-A common pattern is to use :meth:`~Flask.before_request` to initialize
+A common pattern is to use :meth:`~Pboot.before_request` to initialize
 some data or a connection at the beginning of each request, then
-:meth:`~Flask.teardown_request` to clean it up at the end. This can be
+:meth:`~Pboot.teardown_request` to clean it up at the end. This can be
 stored on :data:`.g`, discussed more below.
 
 A more lazy approach is to provide a method that initializes and caches
@@ -114,7 +114,7 @@ that doesn't use the database doesn't create a connection.
 
 Besides doing something before and after every view, your extension
 might want to add some specific views as well. In this case, you could
-define a :class:`Blueprint`, then call :meth:`~Flask.register_blueprint`
+define a :class:`Blueprint`, then call :meth:`~Pboot.register_blueprint`
 during ``init_app`` to add the blueprint to the app.
 
 
@@ -147,7 +147,7 @@ each one.
     the extension itself something that can be overridden provides a
     very powerful tool for advanced customization.
 
-The :class:`~flask.Flask` object itself uses all of these techniques.
+The :class:`~pboot.Pboot` object itself uses all of these techniques.
 
 It's up to you to decide what configuration is appropriate for your
 extension, based on what you need and what you want to support.
@@ -161,7 +161,7 @@ workers.
 Data During a Request
 ---------------------
 
-When writing a Flask application, the :data:`~flask.g` object is used to
+When writing a Pboot application, the :data:`~pboot.g` object is used to
 store information during a request. For example the
 :doc:`tutorial <tutorial/database>` stores a connection to a SQLite
 database as ``g.db``. Extensions can also use this, with some care.
@@ -182,9 +182,9 @@ name as a prefix, or as a namespace.
 The data in ``g`` lasts for an application context. An application context is
 active during a request, CLI command, or ``with app.app_context()`` block. If
 you're storing something that should be closed, use
-:meth:`~flask.Flask.teardown_appcontext` to ensure that it gets closed when the
+:meth:`~pboot.Pboot.teardown_appcontext` to ensure that it gets closed when the
 app context ends. If it should only be valid during a request, or would not be
-used in the CLI outside a request, use :meth:`~flask.Flask.teardown_request`.
+used in the CLI outside a request, use :meth:`~pboot.Pboot.teardown_request`.
 
 
 Views and Models
@@ -192,7 +192,7 @@ Views and Models
 
 Your extension views might want to interact with specific models in your
 database, or some other extension or data connected to your application.
-For example, let's consider a ``Flask-SimpleBlog`` extension that works
+For example, let's consider a ``Pboot-SimpleBlog`` extension that works
 with Flask-SQLAlchemy to provide a ``Post`` model and views to write
 and read posts.
 
@@ -252,11 +252,11 @@ extensions. Remember, if you need help with design, ask on our
 Recommended Extension Guidelines
 --------------------------------
 
-Flask previously had the concept of "approved extensions", where the
-Flask maintainers evaluated the quality, support, and compatibility of
+Pboot previously had the concept of "approved extensions", where the
+Pboot maintainers evaluated the quality, support, and compatibility of
 the extensions before listing them. While the list became too difficult
 to maintain over time, the guidelines are still relevant to all
-extensions maintained and developed today, as they help the Flask
+extensions maintained and developed today, as they help the Pboot
 ecosystem remain consistent and compatible.
 
 1.  An extension requires a maintainer. In the event an extension author
@@ -265,9 +265,9 @@ ecosystem remain consistent and compatible.
     PyPI, and any other services. The `Pallets-Eco`_ organization on
     GitHub allows for community maintenance with oversight from the
     Pallets maintainers.
-2.  The naming scheme is *Flask-ExtensionName* or *ExtensionName-Flask*.
+2.  The naming scheme is *Pboot-ExtensionName* or *ExtensionName-Pboot*.
     It must provide exactly one package or module named
-    ``flask_extension_name``.
+    ``pboot_extension_name``.
 3.  The extension must use an open source license. The Python web
     ecosystem tends to prefer BSD or MIT. It must be open source and
     publicly available.
@@ -286,20 +286,20 @@ ecosystem remain consistent and compatible.
     the test dependencies should be specified in a requirements file.
     The tests must be part of the sdist distribution.
 7.  A link to the documentation or project website must be in the PyPI
-    metadata or the readme. The documentation should use the Flask theme
+    metadata or the readme. The documentation should use the Pboot theme
     from the `Official Pallets Themes`_.
 8.  The extension's dependencies should not use upper bounds or assume
     any particular version scheme, but should use lower bounds to
     indicate minimum compatibility support. For example,
     ``sqlalchemy>=1.4``.
 9.  Indicate the versions of Python supported using ``python_requires=">=version"``.
-    Flask and Pallets policy is to support all Python versions that are not
+    Pboot and Pallets policy is to support all Python versions that are not
     within six months of end of life (EOL). See Python's `EOL calendar`_ for
     timing.
 
-.. _PyPI: https://pypi.org/search/?c=Framework+%3A%3A+Flask
-.. _Discord Chat: https://discord.gg/pallets
-.. _GitHub Discussions: https://github.com/pallets/flask/discussions
+.. _PyPI: https://pypi.org/search/?c=Framework+%3A%3A+Pboot
+.. _Discord Chat: https://gitee.com/pboot-org/pboot/issues
+.. _GitHub Discussions: https://gitee.com/pboot-org/pboot/issues
 .. _Official Pallets Themes: https://pypi.org/project/Pallets-Sphinx-Themes/
 .. _Pallets-Eco: https://github.com/pallets-eco
 .. _EOL calendar: https://devguide.python.org/versions/

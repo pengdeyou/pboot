@@ -37,7 +37,7 @@ Running
 -------
 
 The only required argument to ``waitress-serve`` tells it how to load
-your Flask application. The syntax is ``{module}:{app}``. ``module`` is
+your Pboot application. The syntax is ``{module}:{app}``. ``module`` is
 the dotted import name to the module with your application. ``app`` is
 the variable with the application. If you're using the app factory
 pattern, use ``--call {module}:{factory}`` instead.

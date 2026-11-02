@@ -1,5 +1,5 @@
-from flask import Flask
+from pboot import Pboot
 
 raise ImportError()
 
-testapp = Flask("testapp")
+testapp = Pboot("testapp")

@@ -18,10 +18,10 @@ Configuration
 Basic setup can be done by defining ``MONGODB_SETTINGS`` on
 ``app.config`` and creating a ``MongoEngine`` instance. ::
 
-    from flask import Flask
+    from pboot import Pboot
     from flask_mongoengine import MongoEngine
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.config['MONGODB_SETTINGS'] = {
         "db": "myapp",
     }

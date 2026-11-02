@@ -1,12 +1,12 @@
-.. currentmodule:: flask
+.. currentmodule:: pboot
 
 Blueprints and Views
 ====================
 
 A view function is the code you write to respond to requests to your
-application. Flask uses patterns to match the incoming request URL to
-the view that should handle it. The view returns data that Flask turns
-into an outgoing response. Flask can also go the other direction and
+application. Pboot uses patterns to match the incoming request URL to
+the view that should handle it. The view returns data that Pboot turns
+into an outgoing response. Pboot can also go the other direction and
 generate a URL to a view based on its name and arguments.
 
 
@@ -19,22 +19,22 @@ an application, they are registered with a blueprint. Then the blueprint
 is registered with the application when it is available in the factory
 function.
 
-Flaskr will have two blueprints, one for authentication functions and
+Pbootr will have two blueprints, one for authentication functions and
 one for the blog posts functions. The code for each blueprint will go
 in a separate module. Since the blog needs to know about authentication,
 you'll write the authentication one first.
 
 .. code-block:: python
-    :caption: ``flaskr/auth.py``
+    :caption: ``pbootr/auth.py``
 
     import functools
 
-    from flask import (
+    from pboot import (
         Blueprint, flash, g, redirect, render_template, request, session, url_for
     )
     from werkzeug.security import check_password_hash, generate_password_hash
 
-    from flaskr.db import get_db
+    from pbootr.db import get_db
 
     bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -44,11 +44,11 @@ is passed as the second argument. The ``url_prefix`` will be prepended
 to all the URLs associated with the blueprint.
 
 Import and register the blueprint from the factory using
-:meth:`app.register_blueprint() <Flask.register_blueprint>`. Place the
+:meth:`app.register_blueprint() <Pboot.register_blueprint>`. Place the
 new code at the end of the factory function before returning the app.
 
 .. code-block:: python
-    :caption: ``flaskr/__init__.py``
+    :caption: ``pbootr/__init__.py``
 
     def create_app():
         app = ...
@@ -77,7 +77,7 @@ For now you will just write the view code. On the next page, you'll
 write templates to generate the HTML form.
 
 .. code-block:: python
-    :caption: ``flaskr/auth.py``
+    :caption: ``pbootr/auth.py``
 
     @bp.route('/register', methods=('GET', 'POST'))
     def register():
@@ -111,7 +111,7 @@ write templates to generate the HTML form.
 Here's what the ``register`` view function is doing:
 
 #.  :meth:`@bp.route <Blueprint.route>` associates the URL ``/register``
-    with the ``register`` view function. When Flask receives a request
+    with the ``register`` view function. When Pboot receives a request
     to ``/auth/register``, it will call the ``register`` view and use
     the return value as the response.
 
@@ -168,7 +168,7 @@ Login
 This view follows the same pattern as the ``register`` view above.
 
 .. code-block:: python
-    :caption: ``flaskr/auth.py``
+    :caption: ``pbootr/auth.py``
 
     @bp.route('/login', methods=('GET', 'POST'))
     def login():
@@ -212,7 +212,7 @@ There are a few differences from the ``register`` view:
     When validation succeeds, the user's ``id`` is stored in a new
     session. The data is stored in a *cookie* that is sent to the
     browser, and the browser then sends it back with subsequent requests.
-    Flask securely *signs* the data so that it can't be tampered with.
+    Pboot securely *signs* the data so that it can't be tampered with.
 
 Now that the user's ``id`` is stored in the :data:`.session`, it will be
 available on subsequent requests. At the beginning of each request, if
@@ -220,7 +220,7 @@ a user is logged in their information should be loaded and made
 available to other views.
 
 .. code-block:: python
-    :caption: ``flaskr/auth.py``
+    :caption: ``pbootr/auth.py``
 
     @bp.before_app_request
     def load_logged_in_user():
@@ -249,7 +249,7 @@ To log out, you need to remove the user id from the :data:`.session`.
 Then ``load_logged_in_user`` won't load a user on subsequent requests.
 
 .. code-block:: python
-    :caption: ``flaskr/auth.py``
+    :caption: ``pbootr/auth.py``
 
     @bp.route('/logout')
     def logout():
@@ -265,7 +265,7 @@ logged in. A *decorator* can be used to check this for each view it's
 applied to.
 
 .. code-block:: python
-    :caption: ``flaskr/auth.py``
+    :caption: ``pbootr/auth.py``
 
     def login_required(view):
         @functools.wraps(view)

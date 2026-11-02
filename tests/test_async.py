@@ -2,11 +2,11 @@ import asyncio
 
 import pytest
 
-from flask import Blueprint
-from flask import Flask
-from flask import request
-from flask.views import MethodView
-from flask.views import View
+from pboot import Blueprint
+from pboot import Pboot
+from pboot import request
+from pboot.views import MethodView
+from pboot.views import View
 
 pytest.importorskip("asgiref")
 
@@ -39,7 +39,7 @@ class AsyncMethodView(MethodView):
 
 @pytest.fixture(name="async_app")
 def _async_app():
-    app = Flask(__name__)
+    app = Pboot(__name__)
 
     @app.route("/", methods=["GET", "POST"])
     @app.route("/home", methods=["GET", "POST"])
@@ -100,7 +100,7 @@ def test_async_before_after_request():
     bp_before_called = False
     bp_after_called = False
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
 
     @app.route("/")
     def index():

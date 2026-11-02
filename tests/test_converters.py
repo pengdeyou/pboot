@@ -1,8 +1,8 @@
 from werkzeug.routing import BaseConverter
 
-from flask import request
-from flask import session
-from flask import url_for
+from pboot import request
+from pboot import session
+from pboot import url_for
 
 
 def test_custom_converters(app, client):

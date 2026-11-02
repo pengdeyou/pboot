@@ -3,7 +3,7 @@ Async with Gevent
 
 `Gevent`_ patches Python's standard library to run within special async workers
 called `greenlets`_. Gevent has existed since long before Python's native
-asyncio was available, and Flask has always worked with it.
+asyncio was available, and Pboot has always worked with it.
 
 .. _gevent: https://www.gevent.org
 .. _greenlets: https://greenlet.readthedocs.io
@@ -13,7 +13,7 @@ and to achieve similar capabilities to ASGI and asyncio. This works without
 needing to write ``async def`` or ``await`` anywhere, but relies on gevent and
 greenlet's low level manipulation of the Python interpreter.
 
-Deciding whether you should use gevent with Flask, or `Quart`_, or something
+Deciding whether you should use gevent with Pboot, or `Quart`_, or something
 else, is ultimately up to understanding the specific needs of your project.
 
 .. _quart: https://quart.palletsprojects.com
@@ -48,7 +48,7 @@ To run concurrent tasks within your own code, such as views, use
         gevent.spawn(email.send, to="example@example.example", text="example")
         return "Email is being sent."
 
-If you need to access :data:`request` or other Flask context globals within the
+If you need to access :data:`request` or other Pboot context globals within the
 spawned function, decorate the function with :func:`.stream_with_context` or
 :func:`.copy_current_request_context`. Prefer passing the exact data you need
 when spawning the function, rather than using the decorators.
@@ -64,9 +64,9 @@ when spawning the function, rather than using the decorators.
 Combining with ``async``/``await``
 ----------------------------------
 
-Gevent's patching does not interact well with Flask's built-in asyncio support.
+Gevent's patching does not interact well with Pboot's built-in asyncio support.
 If you want to use Gevent and asyncio in the same app, you'll need to override
-:meth:`flask.Flask.async_to_sync` to run async functions inside gevent.
+:meth:`pboot.Pboot.async_to_sync` to run async functions inside gevent.
 
 .. code-block:: python
 
@@ -74,12 +74,12 @@ If you want to use Gevent and asyncio in the same app, you'll need to override
     gevent.monkey.patch_all()
 
     import asyncio
-    from flask import Flask, request
+    from pboot import Pboot, request
 
     loop = asyncio.EventLoop()
     gevent.spawn(loop.run_forever)
 
-    class GeventFlask(Flask):
+    class GeventPboot(Pboot):
         def async_to_sync(self, func):
             def run(*args, **kwargs):
                 coro = func(*args, **kwargs)
@@ -88,7 +88,7 @@ If you want to use Gevent and asyncio in the same app, you'll need to override
 
             return run
 
-    app = GeventFlask(__name__)
+    app = GeventPboot(__name__)
 
     @app.get("/")
     async def greet():

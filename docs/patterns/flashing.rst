@@ -3,7 +3,7 @@ Message Flashing
 
 Good applications and user interfaces are all about feedback.  If the user
 does not get enough feedback they will probably end up hating the
-application.  Flask provides a really simple way to give feedback to a
+application.  Pboot provides a really simple way to give feedback to a
 user with the flashing system.  The flashing system basically makes it
 possible to record a message at the end of a request and access it next
 request and only next request.  This is usually combined with a layout
@@ -16,10 +16,10 @@ Simple Flashing
 
 So here is a full example::
 
-    from flask import Flask, flash, redirect, render_template, \
+    from pboot import Pboot, flash, redirect, render_template, \
          request, url_for
 
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
     @app.route('/')
@@ -99,12 +99,12 @@ categories can be used to give the user better feedback.  For example
 error messages could be displayed with a red background.
 
 To flash a message with a different category, just use the second argument
-to the :func:`~flask.flash` function::
+to the :func:`~pboot.flash` function::
 
     flash('Invalid password provided', 'error')
 
 Inside the template you then have to tell the
-:func:`~flask.get_flashed_messages` function to also return the
+:func:`~pboot.get_flashed_messages` function to also return the
 categories.  The loop looks slightly different in that situation then:
 
 .. sourcecode:: html+jinja
@@ -129,7 +129,7 @@ Filtering Flash Messages
 .. versionadded:: 0.9
 
 Optionally you can pass a list of categories which filters the results of
-:func:`~flask.get_flashed_messages`.  This is useful if you wish to
+:func:`~pboot.get_flashed_messages`.  This is useful if you wish to
 render each category in a separate block.
 
 .. sourcecode:: html+jinja

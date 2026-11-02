@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from flask import Flask
-from flask import Response
+from pboot import Pboot
+from pboot import Response
 
-app = Flask(__name__)
+app = Pboot(__name__)
 
 
 @app.after_request

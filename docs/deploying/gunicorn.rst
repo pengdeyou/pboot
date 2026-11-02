@@ -39,7 +39,7 @@ Create a virtualenv, install your application, then install
 Running
 -------
 
-The only required argument to Gunicorn tells it how to load your Flask
+The only required argument to Gunicorn tells it how to load your Pboot
 application. The syntax is ``{module_import}:{app_variable}``.
 ``module_import`` is the dotted import name to the module with your
 application. ``app_variable`` is the variable with the application. It

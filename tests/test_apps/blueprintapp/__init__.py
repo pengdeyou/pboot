@@ -1,6 +1,6 @@
-from flask import Flask
+from pboot import Pboot
 
-app = Flask(__name__)
+app = Pboot(__name__)
 app.config["DEBUG"] = True
 from blueprintapp.apps.admin import admin  # noqa: E402
 from blueprintapp.apps.frontend import frontend  # noqa: E402

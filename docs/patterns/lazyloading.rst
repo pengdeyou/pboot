@@ -1,10 +1,10 @@
 Lazily Loading Views
 ====================
 
-Flask is usually used with the decorators.  Decorators are simple and you
+Pboot is usually used with the decorators.  Decorators are simple and you
 have the URL right next to the function that is called for that specific
 URL.  However there is a downside to this approach: it means all your code
-that uses decorators has to be imported upfront or Flask will never
+that uses decorators has to be imported upfront or Pboot will never
 actually find your function.
 
 This can be a problem if your application has to import quick.  It might
@@ -13,7 +13,7 @@ if you suddenly notice that your application outgrows this approach you
 can fall back to a centralized URL mapping.
 
 The system that enables having a central URL map is the
-:meth:`~flask.Flask.add_url_rule` function.  Instead of using decorators,
+:meth:`~pboot.Pboot.add_url_rule` function.  Instead of using decorators,
 you have a file that sets up the application with all URLs.
 
 Converting to Centralized URL Map
@@ -21,8 +21,8 @@ Converting to Centralized URL Map
 
 Imagine the current application looks somewhat like this::
 
-    from flask import Flask
-    app = Flask(__name__)
+    from pboot import Pboot
+    app = Pboot(__name__)
 
     @app.route('/')
     def index():
@@ -44,9 +44,9 @@ Then, with the centralized approach you would have one file with the views
 And then a file that sets up an application which maps the functions to
 URLs::
 
-    from flask import Flask
+    from pboot import Pboot
     from yourapplication import views
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.add_url_rule('/', view_func=views.index)
     app.add_url_rule('/user/<username>', view_func=views.user)
 
@@ -74,14 +74,14 @@ function but internally imports the real function on first use::
             return self.view(*args, **kwargs)
 
 What's important here is is that `__module__` and `__name__` are properly
-set.  This is used by Flask internally to figure out how to name the
+set.  This is used by Pboot internally to figure out how to name the
 URL rules in case you don't provide a name for the rule yourself.
 
 Then you can define your central place to combine the views like this::
 
-    from flask import Flask
+    from pboot import Pboot
     from yourapplication.helpers import LazyView
-    app = Flask(__name__)
+    app = Pboot(__name__)
     app.add_url_rule('/',
                      view_func=LazyView('yourapplication.views.index'))
     app.add_url_rule('/user/<username>',
@@ -89,7 +89,7 @@ Then you can define your central place to combine the views like this::
 
 You can further optimize this in terms of amount of keystrokes needed to
 write this by having a function that calls into
-:meth:`~flask.Flask.add_url_rule` by prefixing a string with the project
+:meth:`~pboot.Pboot.add_url_rule` by prefixing a string with the project
 name and a dot, and by wrapping `view_func` in a `LazyView` as needed.  ::
 
     def url(import_name, url_rules=[], **options):

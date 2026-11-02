@@ -17,7 +17,7 @@ efficient.**
 Self-Hosted Options
 -------------------
 
-Flask is a WSGI *application*. A WSGI *server* is used to run the
+Pboot is a WSGI *application*. A WSGI *server* is used to run the
 application, converting incoming HTTP requests to the standard WSGI
 environ, and converting outgoing WSGI responses to HTTP responses.
 
@@ -62,12 +62,12 @@ needing to maintain your own server, networking, domain, etc. Some
 services may have a free tier up to a certain time or bandwidth. Many of
 these services use one of the WSGI servers described above, or a similar
 interface. The links below are for some of the most common platforms,
-which have instructions for Flask, WSGI, or Python.
+which have instructions for Pboot, WSGI, or Python.
 
-- `PythonAnywhere <https://help.pythonanywhere.com/pages/Flask/>`_
+- `PythonAnywhere <https://help.pythonanywhere.com/pages/Pboot/>`_
 - `Google App Engine <https://cloud.google.com/appengine/docs/standard/python3/building-app>`_
 - `Google Cloud Run <https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-python-service>`_
-- `AWS Elastic Beanstalk <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-flask.html>`_
+- `AWS Elastic Beanstalk <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-pboot.html>`_
 - `Microsoft Azure <https://docs.microsoft.com/en-us/azure/app-service/quickstart-python>`_
 
 This list is not exhaustive, and you should evaluate these and other

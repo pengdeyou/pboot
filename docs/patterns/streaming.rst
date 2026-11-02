@@ -45,13 +45,13 @@ Streaming from Templates
 ------------------------
 
 The Jinja template engine supports rendering a template piece by
-piece, returning an iterator of strings. Flask provides the
-:func:`~flask.stream_template` and :func:`~flask.stream_template_string`
+piece, returning an iterator of strings. Pboot provides the
+:func:`~pboot.stream_template` and :func:`~pboot.stream_template_string`
 functions to make this easier to use.
 
 .. code-block:: python
 
-    from flask import stream_template
+    from pboot import stream_template
 
     @app.get("/timeline")
     def timeline():
@@ -74,7 +74,7 @@ during the generator.
 
 .. code-block:: python
 
-    from flask import stream_with_context, request
+    from pboot import stream_with_context, request
     from markupsafe import escape
 
     @app.route('/stream')
@@ -95,6 +95,6 @@ It can also be used as a decorator.
 
     return generate()
 
-The :func:`~flask.stream_template` and
-:func:`~flask.stream_template_string` functions automatically
-use :func:`~flask.stream_with_context` if a request is active.
+The :func:`~pboot.stream_template` and
+:func:`~pboot.stream_template_string` functions automatically
+use :func:`~pboot.stream_with_context` if a request is active.

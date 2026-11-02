@@ -6,10 +6,10 @@ lifecycle of the application and each request. When an event occurs, it emits th
 signal, which calls each subscriber.
 
 Signals are implemented by the `Blinker`_ library. See its documentation for detailed
-information. Flask provides some built-in signals. Extensions may provide their own.
+information. Pboot provides some built-in signals. Extensions may provide their own.
 
-Many signals mirror Flask's decorator-based callbacks with similar names. For example,
-the :data:`.request_started` signal is similar to the :meth:`~.Flask.before_request`
+Many signals mirror Pboot's decorator-based callbacks with similar names. For example,
+the :data:`.request_started` signal is similar to the :meth:`~.Pboot.before_request`
 decorator. The advantage of signals over handlers is that they can be subscribed to
 temporarily, and can't directly affect the application. This is useful for testing,
 metrics, auditing, and more. For example, if you want to know what templates were
@@ -33,7 +33,7 @@ argument is the function that should be called when the signal is emitted,
 the optional second argument specifies a sender.  To unsubscribe from a
 signal, you can use the :meth:`~blinker.base.Signal.disconnect` method.
 
-For all core Flask signals, the sender is the application that issued the
+For all core Pboot signals, the sender is the application that issued the
 signal.  When you subscribe to a signal, be sure to also provide a sender
 unless you really want to listen for signals from all applications.  This is
 especially true if you are developing an extension.
@@ -42,7 +42,7 @@ For example, here is a helper context manager that can be used in a unit test
 to determine which templates were rendered and what variables were passed
 to the template::
 
-    from flask import template_rendered
+    from pboot import template_rendered
     from contextlib import contextmanager
 
     @contextmanager
@@ -67,7 +67,7 @@ This can now easily be paired with a test client::
         assert len(context['items']) == 10
 
 Make sure to subscribe with an extra ``**extra`` argument so that your
-calls don't fail if Flask introduces new arguments to the signals.
+calls don't fail if Pboot introduces new arguments to the signals.
 
 All the template rendering in the code issued by the application `app`
 in the body of the ``with`` block will now be recorded in the `templates`
@@ -80,7 +80,7 @@ temporarily subscribe a function to a signal with a context manager on
 its own.  Because the return value of the context manager cannot be
 specified that way, you have to pass the list in as an argument::
 
-    from flask import template_rendered
+    from pboot import template_rendered
 
     def captured_templates(app, recorded, **extra):
         def record(sender, template, context):
@@ -135,19 +135,19 @@ function, you can pass ``current_app._get_current_object()`` as sender.
 
 .. admonition:: Passing Proxies as Senders
 
-   Never pass :data:`~flask.current_app` as sender to a signal.  Use
+   Never pass :data:`~pboot.current_app` as sender to a signal.  Use
    ``current_app._get_current_object()`` instead.  The reason for this is
-   that :data:`~flask.current_app` is a proxy and not the real application
+   that :data:`~pboot.current_app` is a proxy and not the real application
    object.
 
 
-Signals and Flask's Request Context
+Signals and Pboot's Request Context
 -----------------------------------
 
-Context-local proxies are available between :data:`~flask.request_started` and
-:data:`~flask.request_finished`, so you can rely on :class:`flask.g` and others
+Context-local proxies are available between :data:`~pboot.request_started` and
+:data:`~pboot.request_finished`, so you can rely on :class:`pboot.g` and others
 as needed. Note the limitations described in :ref:`signals-sending` and the
-:data:`~flask.request_tearing_down` signal.
+:data:`~pboot.request_tearing_down` signal.
 
 
 Decorator Based Signal Subscriptions
@@ -156,7 +156,7 @@ Decorator Based Signal Subscriptions
 You can also easily subscribe to signals by using the
 :meth:`~blinker.base.NamedSignal.connect_via` decorator::
 
-    from flask import template_rendered
+    from pboot import template_rendered
 
     @template_rendered.connect_via(app)
     def when_template_rendered(sender, template, context, **extra):

@@ -1,15 +1,15 @@
 from io import StringIO
 
-import flask
+import pboot
 
 
 def test_suppressed_exception_logging():
-    class SuppressedFlask(flask.Flask):
+    class SuppressedPboot(pboot.Pboot):
         def log_exception(self, ctx, exc_info):
             pass
 
     out = StringIO()
-    app = SuppressedFlask(__name__)
+    app = SuppressedPboot(__name__)
 
     @app.route("/")
     def index():

@@ -18,8 +18,8 @@ errors:
 
 And that's just a small sample of issues you could be facing. So how do we
 deal with that sort of problem? By default if your application runs in
-production mode, and an exception is raised Flask will display a very simple
-page for you and log the exception to the :attr:`~flask.Flask.logger`.
+production mode, and an exception is raised Pboot will display a very simple
+page for you and log the exception to the :attr:`~pboot.Pboot.logger`.
 
 But there is more you can do, and we will cover some better setups to deal
 with errors including custom exceptions and 3rd party tools.
@@ -42,20 +42,20 @@ variables for debugging, and sends you mails based on new errors or
 frequency thresholds.
 
 To use Sentry you need to install the ``sentry-sdk`` client with extra
-``flask`` dependencies.
+``pboot`` dependencies.
 
 .. code-block:: text
 
-    $ pip install sentry-sdk[flask]
+    $ pip install sentry-sdk[pboot]
 
-And then add this to your Flask app:
+And then add this to your Pboot app:
 
 .. code-block:: python
 
     import sentry_sdk
-    from sentry_sdk.integrations.flask import FlaskIntegration
+    from sentry_sdk.integrations.pboot import PbootIntegration
 
-    sentry_sdk.init('YOUR_DSN_HERE', integrations=[FlaskIntegration()])
+    sentry_sdk.init('YOUR_DSN_HERE', integrations=[PbootIntegration()])
 
 The ``YOUR_DSN_HERE`` value needs to be replaced with the DSN value you
 get from your Sentry installation.
@@ -69,13 +69,13 @@ See also:
 -   Sentry also supports catching errors from a worker queue
     (RQ, Celery, etc.) in a similar fashion. See the `Python SDK docs
     <https://docs.sentry.io/platforms/python/>`__ for more information.
--   `Flask-specific documentation <https://docs.sentry.io/platforms/python/guides/flask/>`__
+-   `Pboot-specific documentation <https://docs.sentry.io/platforms/python/guides/pboot/>`__
 
 
 Error Handlers
 --------------
 
-When an error occurs in Flask, an appropriate `HTTP status code
+When an error occurs in Pboot, an appropriate `HTTP status code
 <https://developer.mozilla.org/en-US/docs/Web/HTTP/Status>`__ will be
 returned. 400-499 indicate errors with the client's request data, or
 about the data requested. 500-599 indicate errors with the server or
@@ -98,8 +98,8 @@ Registering
 ```````````
 
 Register handlers by decorating a function with
-:meth:`~flask.Flask.errorhandler`. Or use
-:meth:`~flask.Flask.register_error_handler` to register the function later.
+:meth:`~pboot.Pboot.errorhandler`. Or use
+:meth:`~pboot.Pboot.register_error_handler` to register the function later.
 Remember to set the error code when returning the response.
 
 .. code-block:: python
@@ -139,7 +139,7 @@ of a parent class.
 Handling
 ````````
 
-When building a Flask application you *will* run into exceptions. If some part
+When building a Pboot application you *will* run into exceptions. If some part
 of your code breaks while handling a request (and you have no error handlers
 registered), a "500 Internal Server Error"
 (:exc:`~werkzeug.exceptions.InternalServerError`) will be returned by default.
@@ -148,15 +148,15 @@ Similarly, "404 Not Found"
 If a route receives an unallowed request method, a "405 Method Not Allowed"
 (:exc:`~werkzeug.exceptions.MethodNotAllowed`) will be raised. These are all
 subclasses of :class:`~werkzeug.exceptions.HTTPException` and are provided by
-default in Flask.
+default in Pboot.
 
-Flask gives you the ability to raise any HTTP exception registered by
+Pboot gives you the ability to raise any HTTP exception registered by
 Werkzeug. However, the default HTTP exceptions return simple exception
 pages. You might want to show custom error pages to the user when an error occurs.
 This can be done by registering error handlers.
 
-When Flask catches an exception while handling a request, it is first looked up by code.
-If no handler is registered for the code, Flask looks up the error by its class hierarchy; the most specific handler is chosen.
+When Pboot catches an exception while handling a request, it is first looked up by code.
+If no handler is registered for the code, Pboot looks up the error by its class hierarchy; the most specific handler is chosen.
 If no handler is registered, :class:`~werkzeug.exceptions.HTTPException` subclasses show a
 generic message about their code, while other exceptions are converted to a
 generic "500 Internal Server Error".
@@ -188,7 +188,7 @@ so you don't lose information about the HTTP error.
 
 .. code-block:: python
 
-    from flask import json
+    from pboot import json
     from werkzeug.exceptions import HTTPException
 
     @app.errorhandler(HTTPException)
@@ -239,11 +239,11 @@ Unhandled Exceptions
 
 When there is no error handler registered for an exception, a 500
 Internal Server Error will be returned instead. See
-:meth:`flask.Flask.handle_exception` for information about this
+:meth:`pboot.Pboot.handle_exception` for information about this
 behavior.
 
 If there is an error handler registered for ``InternalServerError``,
-this will be invoked. As of Flask 1.1.0, this error handler will always
+this will be invoked. As of Pboot 1.1.0, this error handler will always
 be passed an instance of ``InternalServerError``, not the original
 unhandled error.
 
@@ -258,10 +258,10 @@ interactive debugger will be shown.
 Custom Error Pages
 ------------------
 
-Sometimes when building a Flask application, you might want to raise a
+Sometimes when building a Pboot application, you might want to raise a
 :exc:`~werkzeug.exceptions.HTTPException` to signal to the user that
-something is wrong with the request. Fortunately, Flask comes with a handy
-:func:`~flask.abort` function that aborts a request with a HTTP error from
+something is wrong with the request. Fortunately, Pboot comes with a handy
+:func:`~pboot.abort` function that aborts a request with a HTTP error from
 werkzeug as desired. It will also provide a plain black and white error page
 for you with a basic description, but nothing fancy.
 
@@ -274,7 +274,7 @@ username and we can't find it, we raise a "404 Not Found".
 
 .. code-block:: python
 
-    from flask import abort, render_template, request
+    from pboot import abort, render_template, request
 
     # a username needs to be supplied in the query args
     # a successful request would be like /profile?username=jack
@@ -296,7 +296,7 @@ Here is another example implementation for a "404 Page Not Found" exception:
 
 .. code-block:: python
 
-    from flask import render_template
+    from pboot import render_template
 
     @app.errorhandler(404)
     def page_not_found(e):
@@ -307,13 +307,13 @@ When using :doc:`/patterns/appfactories`:
 
 .. code-block:: python
 
-    from flask import Flask, render_template
+    from pboot import Pboot, render_template
 
     def page_not_found(e):
       return render_template('404.html'), 404
 
     def create_app(config_filename):
-        app = Flask(__name__)
+        app = Pboot(__name__)
         app.register_error_handler(404, page_not_found)
         return app
 
@@ -350,7 +350,7 @@ It can be implemented by rendering the template on "500 Internal Server Error":
 
 .. code-block:: python
 
-    from flask import render_template
+    from pboot import render_template
 
     @app.errorhandler(500)
     def internal_server_error(e):
@@ -361,13 +361,13 @@ When using :doc:`/patterns/appfactories`:
 
 .. code-block:: python
 
-    from flask import Flask, render_template
+    from pboot import Pboot, render_template
 
     def internal_server_error(e):
       return render_template('500.html'), 500
 
     def create_app():
-        app = Flask(__name__)
+        app = Pboot(__name__)
         app.register_error_handler(500, internal_server_error)
         return app
 
@@ -375,7 +375,7 @@ When using :doc:`/blueprints`:
 
 .. code-block:: python
 
-    from flask import Blueprint
+    from pboot import Blueprint
 
     blog = Blueprint('blog', __name__)
 
@@ -406,7 +406,7 @@ prefixes, they may be defined at the application level using the
 
 .. code-block:: python
 
-    from flask import jsonify, render_template
+    from pboot import jsonify, render_template
 
     # at the application level
     # not the blueprint level
@@ -434,18 +434,18 @@ prefixes, they may be defined at the application level using the
 Returning API Errors as JSON
 ----------------------------
 
-When building APIs in Flask, some developers realise that the built-in
+When building APIs in Pboot, some developers realise that the built-in
 exceptions are not expressive enough for APIs and that the content type of
 :mimetype:`text/html` they are emitting is not very useful for API consumers.
 
-Using the same techniques as above and :func:`~flask.json.jsonify` we can return JSON
-responses to API errors.  :func:`~flask.abort` is called
+Using the same techniques as above and :func:`~pboot.json.jsonify` we can return JSON
+responses to API errors.  :func:`~pboot.abort` is called
 with a ``description`` parameter. The error handler will
 use that as the JSON error message, and set the status code to 404.
 
 .. code-block:: python
 
-    from flask import abort, jsonify
+    from pboot import abort, jsonify
 
     @app.errorhandler(404)
     def resource_not_found(e):
@@ -469,7 +469,7 @@ This is a simple example:
 
 .. code-block:: python
 
-    from flask import jsonify, request
+    from pboot import jsonify, request
 
     class InvalidAPIUsage(Exception):
         status_code = 400

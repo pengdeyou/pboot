@@ -4,7 +4,7 @@ JavaScript Ajax Example
 Demonstrates how to post form data and process a JSON response using
 JavaScript. This allows making requests without navigating away from the
 page. Demonstrates using |fetch|_, |XMLHttpRequest|_,  and
-|jQuery.ajax|_. See the `Flask docs`_ about JavaScript and Ajax.
+|jQuery.ajax|_. See the `Pboot docs`_ about JavaScript and Ajax.
 
 .. |fetch| replace:: ``fetch``
 .. _fetch: https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
@@ -15,7 +15,7 @@ page. Demonstrates using |fetch|_, |XMLHttpRequest|_,  and
 .. |jQuery.ajax| replace:: ``jQuery.ajax``
 .. _jQuery.ajax: https://api.jquery.com/jQuery.ajax/
 
-.. _Flask docs: https://flask.palletsprojects.com/patterns/javascript/
+.. _Pboot docs: https://gitee.com/pboot-org/pboot/blob/main/docs/patterns/javascript.rst
 
 
 Install
@@ -33,7 +33,7 @@ Run
 
 .. code-block:: text
 
-    $ flask --app js_example run
+    $ pboot --app js_example run
 
 Open http://127.0.0.1:5000 in a browser.
 
