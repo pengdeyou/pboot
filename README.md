@@ -135,10 +135,12 @@ def test_index():
 
 | 变量 | 说明 |
 | --- | --- |
-| `PBOOT_APP` | 指定要加载的应用或工厂函数 |
+| `PBOOT_APP` | 指定要加载的应用或工厂函数（等价于 `--app`） |
 | `PBOOT_DEBUG` | 开启调试模式 |
-| `PBOOT_RUN_PORT` | 指定开发服务器端口 |
 | `PBOOT_SKIP_DOTENV` | 跳过 `.pbootenv` / `.env` 加载 |
+
+> 端口与主机请用 `--port` / `--host` 命令行参数指定。
+> 从 Flask 迁移请查阅 [迁移指导](docs/migration-from-flask.md)。
 
 ## 参与贡献
 
